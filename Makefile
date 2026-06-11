@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ENSURE_GARDENER_MOD         := $(shell go get github.com/gardener/gardener@$$(go list -m -f "{{.Version}}" github.com/gardener/gardener))
-GARDENER_HACK_DIR    		:= $(shell go list -m -f "{{.Dir}}" github.com/gardener/gardener)/hack
+# -mod=mod: with a vendor/ directory present (carrying the ODP k8s-1.35
+# stopgap patch), "go list -m" runs in vendor mode and cannot resolve module
+# cache paths; the gardener hack scripts only exist in the module cache.
+ENSURE_GARDENER_MOD         := $(shell go get github.com/gardener/gardener@$$(go list -mod=mod -m -f "{{.Version}}" github.com/gardener/gardener))
+GARDENER_HACK_DIR    		:= $(shell go list -mod=mod -m -f "{{.Dir}}" github.com/gardener/gardener)/hack
 EXTENSION_PREFIX            := gardener-extension
 NAME                        := provider-hcloud
 ADMISSION_NAME              := admission-hcloud
