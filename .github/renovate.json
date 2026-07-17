@@ -18,7 +18,8 @@
     "forkProcessing": "enabled",
     "enabledManagers": [
         "gomod",
-        "custom.regex"
+        "custom.regex",
+        "github-actions"
     ],
     "prCreation": "immediate",
     "recreateWhen": "always",
