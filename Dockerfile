@@ -16,7 +16,7 @@ ARG EFFECTIVE_VERSION
 RUN make install EFFECTIVE_VERSION=$EFFECTIVE_VERSION
 
 ############# base
-FROM gcr.io/distroless/static-debian12:nonroot as base
+FROM gcr.io/distroless/static-debian12:nonroot AS base
 
 WORKDIR /
 
