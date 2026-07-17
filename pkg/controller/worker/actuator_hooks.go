@@ -24,6 +24,7 @@ import (
 	hcloud "github.com/hetznercloud/hcloud-go/v2/hcloud"
 
 	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/controller/worker/ensurer"
+	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis"
 	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis/transcoder"
 )
 
@@ -32,27 +33,34 @@ import (
 // PARAMETERS
 // _ context.Context Execution context
 func (w *workerDelegate) PreReconcileHook(ctx context.Context) error {
-	test, _, _ := w.hclient.ServerType.List(ctx, hcloud.ServerTypeListOpts{})
-	srvTypeIdToName := make(map[int64]string, len(test))
+	serverTypes, _, err := w.hclient.ServerType.List(ctx, hcloud.ServerTypeListOpts{})
+	if err != nil {
+		return fmt.Errorf("unable to list server types: %w", err)
+	}
 
-	for _, srvType := range test {
-		srvTypeIdToName[srvType.ID] = srvType.Name
+	serverTypesByName := make(map[string]*hcloud.ServerType, len(serverTypes))
+	for _, serverType := range serverTypes {
+		serverTypesByName[serverType.Name] = serverType
 	}
 
 	for _, pool := range w.worker.Spec.Pools {
 		// currently there is only one zone per region on hetzner.
-		zone := pool.Zones[0]
-		dc, _, _ := w.hclient.Datacenter.Get(ctx, zone)
+		locationName := apis.GetRegionFromZone(pool.Zones[0])
+
+		serverType, ok := serverTypesByName[pool.MachineType]
+		if !ok {
+			return fmt.Errorf("Machine Type %s does not exist", pool.MachineType)
+		}
 
 		machineTypeAvailable := false
-		for _, curServerType := range dc.ServerTypes.Available {
-			if pool.MachineType == srvTypeIdToName[curServerType.ID] {
+		for _, serverTypeLocation := range serverType.Locations {
+			if serverTypeLocation.Available && serverTypeLocation.Location != nil && serverTypeLocation.Location.Name == locationName {
 				machineTypeAvailable = true
 				break
 			}
 		}
 		if !machineTypeAvailable {
-			return fmt.Errorf("Machine Type %s is currently not availbe in %s", pool.MachineType, dc.Name)
+			return fmt.Errorf("Machine Type %s is currently not available in %s", pool.MachineType, locationName)
 		}
 	}
 
