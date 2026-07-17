@@ -22,9 +22,11 @@ jobs:
         go-version-file: go.mod
     - name: Create controller-registration.yaml
       run: |-
-        GOPATH=$(go env GOPATH)
-        export GOPATH
-        
+        # Populate the module cache before make: the Makefile resolves
+        # GARDENER_HACK_DIR and GARDENER_TOOL_DIR via `go list -m -f {{.Dir}}`
+        # at parse time, which returns empty for modules that are not extracted.
+        go mod download
+
         make generate
     - name: Create Release
       uses: softprops/action-gh-release@v3.0.2
