@@ -1,5 +1,5 @@
 ############# builder
-FROM golang:1.26.4 AS builder
+FROM golang:1.26.5 AS builder
 
 ENV BINARY_PATH=/go/bin
 WORKDIR /go/src/github.com/23technologies/gardener-extension-provider-hcloud

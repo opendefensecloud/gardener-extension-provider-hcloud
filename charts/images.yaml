@@ -10,7 +10,7 @@ images:
 - name: csi-node-driver-registrar
   sourceRepository: https://github.com/kubernetes-csi/node-driver-registrar
   repository: registry.k8s.io/sig-storage/csi-node-driver-registrar
-  tag: v2.16.0 # renovate: datasource=github-releases depName=kubernetes-csi/node-driver-registrar
+  tag: v2.17.0 # renovate: datasource=github-releases depName=kubernetes-csi/node-driver-registrar
 - name: csi-provisioner
   sourceRepository: https://github.com/kubernetes-csi/external-provisioner
   repository: registry.k8s.io/sig-storage/csi-provisioner
@@ -18,7 +18,7 @@ images:
 - name: hcloud-cloud-controller-manager
   sourceRepository: https://github.com/hetznercloud/hcloud-cloud-controller-manager
   repository: docker.io/hetznercloud/hcloud-cloud-controller-manager
-  tag: v1.31.1 # renovate: datasource=github-releases depName=hetznercloud/hcloud-cloud-controller-manager
+  tag: v1.33.0 # renovate: datasource=github-releases depName=hetznercloud/hcloud-cloud-controller-manager
 - name: machine-controller-manager-provider-hcloud
   sourceRepository: https://github.com/23technologies/machine-controller-manager-provider-hcloud
   repository: ghcr.io/23technologies/machine-controller-manager-provider-hcloud
@@ -26,12 +26,12 @@ images:
 - name: csi-driver-controller
   sourceRepository: https://github.com/hetznercloud/csi-driver
   repository: docker.io/hetznercloud/hcloud-csi-driver
-  tag: v2.21.2 # renovate: datasource=github-releases depName=hetznercloud/csi-driver
+  tag: v2.22.0 # renovate: datasource=github-releases depName=hetznercloud/csi-driver
 - name: csi-driver-node
   sourceRepository: https://github.com/hetznercloud/csi-driver
   repository: docker.io/hetznercloud/hcloud-csi-driver
-  tag: v2.21.2 # renovate: datasource=github-releases depName=hetznercloud/csi-driver
+  tag: v2.22.0 # renovate: datasource=github-releases depName=hetznercloud/csi-driver
 - name: liveness-probe
   sourceRepository: https://github.com/kubernetes-csi/livenessprobe
   repository: registry.k8s.io/sig-storage/livenessprobe
-  tag: v2.18.0 # renovate: datasource=github-releases depName=kubernetes-csi/livenessprobe
+  tag: v2.19.0 # renovate: datasource=github-releases depName=kubernetes-csi/livenessprobe
