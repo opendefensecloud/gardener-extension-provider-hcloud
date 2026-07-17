@@ -28,9 +28,9 @@ import (
 	"github.com/gardener/gardener/pkg/apis/extensions/v1alpha1"
 	gardenerclient "github.com/gardener/gardener/pkg/client/kubernetes"
 	mockkubernetes "github.com/gardener/gardener/pkg/client/kubernetes/mock"
-	"go.uber.org/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"go.uber.org/mock/gomock"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
@@ -112,7 +112,7 @@ var _ = Describe("Machines", func() {
 			expect expect
 		}
 
-		machineClassName := fmt.Sprintf("%s-%s-%s-%s", mock.TestNamespace, mock.TestWorkerPoolName, mock.TestZone, "2ef7b")
+		machineClassName := fmt.Sprintf("%s-%s-%s-%s", mock.TestNamespace, mock.TestWorkerPoolName, mock.TestZone, "48c9a")
 
 		DescribeTable("##table",
 			func(data *data) {
