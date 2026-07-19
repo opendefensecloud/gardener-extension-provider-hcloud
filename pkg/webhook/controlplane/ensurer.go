@@ -248,26 +248,37 @@ func (e *ensurer) EnsureAdditionalProvisionFiles(ctx context.Context, gctx gcont
 	return nil
 }
 
-// addContainerdAptPinFile pins the APT package 'containerd' to the 1.7.x line.
-// Ubuntu ships containerd 2.2.1 in the jammy/noble -updates pockets, whose
-// 'ctr images mount' is broken (containerd/containerd#12549, fixed in 2.2.2);
-// gardener-node-init depends on it, so worker nodes never join. Disabling the
-// mount-manager plugin instead is not viable: the CRI image service in 2.2 has
-// a hard dependency on it. See gardener/gardener-extension-os-ubuntu#313. The
-// OS extension's provision script writes OSC files to disk before its
-// 'apt-get install containerd' line, so the pin takes effect on first install;
-// on operating systems without APT the file is inert.
-// TODO: drop this once Ubuntu ships containerd >= 2.2.2 in -updates.
+// addContainerdAptPinFile writes an APT preferences file that refuses the broken
+// containerd versions 2.2.0 and 2.2.1 (Pin-Priority < 0 => never installed).
+// Ubuntu ships 2.2.1 in the jammy/noble -updates pockets, whose 'ctr images mount'
+// is broken (containerd/containerd#12549, fixed in 2.2.2 via containerd/containerd#12831);
+// gardener-node-init depends on it, so worker nodes never join.
+//
+// The pin is version-conditioned rather than release-forcing on purpose: it must
+// protect 22.04/24.04 (which fall back to their 1.7.x release pocket) without
+// constraining 26.04+, which ships the fixed 2.2.2 and has no 1.7.x at all. It runs
+// unconditionally because EnsureAdditionalProvisionFiles does not receive the OSC
+// and cannot determine the pool's Ubuntu version; refusing only the broken versions
+// achieves the OS-gated effect. The OS extension's provision script writes OSC files
+// before its 'apt-get install containerd' line, so the pin takes effect on first
+// install; on operating systems without APT the file is inert.
+// See gardener/gardener-extension-os-ubuntu#313.
 func addContainerdAptPinFile(new *[]extensionsv1alpha1.File) {
 	var (
 		permissions uint32 = 0644
-		content            = `Explanation: containerd 2.2.x from Ubuntu -updates breaks 'ctr images mount'
-Explanation: (containerd/containerd#12549), which gardener-node-init requires.
-Explanation: Remove once Ubuntu ships containerd >= 2.2.2
-Explanation: (gardener/gardener-extension-os-ubuntu#313).
+		content            = `Explanation: Ubuntu ships containerd 2.2.0/2.2.1 in the jammy/noble -updates
+Explanation: pockets; their 'ctr images mount' is broken (containerd/containerd#12549),
+Explanation: which gardener-node-init requires, so worker nodes never join. Fixed in
+Explanation: 2.2.2 (containerd/containerd#12831). Refuse only the broken versions so
+Explanation: 22.04/24.04 fall back to their 1.7.x release pocket and 26.04+ use 2.2.2+.
+Explanation: See gardener/gardener-extension-os-ubuntu#313.
 Package: containerd
-Pin: version 1.7.*
-Pin-Priority: 1001
+Pin: version 2.2.0-*
+Pin-Priority: -1
+
+Package: containerd
+Pin: version 2.2.1-*
+Pin-Priority: -1
 `
 	)
 
