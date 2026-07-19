@@ -49,7 +49,7 @@ func (w *workerDelegate) PreReconcileHook(ctx context.Context) error {
 
 		serverType, ok := serverTypesByName[pool.MachineType]
 		if !ok {
-			return fmt.Errorf("Machine Type %s does not exist", pool.MachineType)
+			return fmt.Errorf("machine type %s does not exist", pool.MachineType)
 		}
 
 		machineTypeAvailable := false
@@ -60,7 +60,7 @@ func (w *workerDelegate) PreReconcileHook(ctx context.Context) error {
 			}
 		}
 		if !machineTypeAvailable {
-			return fmt.Errorf("Machine Type %s is currently not available in %s", pool.MachineType, locationName)
+			return fmt.Errorf("machine type %s is currently not available in %s", pool.MachineType, locationName)
 		}
 	}
 

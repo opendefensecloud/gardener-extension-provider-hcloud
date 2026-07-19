@@ -57,7 +57,7 @@ func ValidateInfrastructureConfigAgainstCloudProfile(
 func ValidateInfrastructureConfigSpec(spec *apis.InfrastructureConfig) []error {
 	var allErrs []error
 
-	if nil != spec.Networks && nil == spec.Networks.WorkersConfiguration && "" == spec.Networks.Workers {
+	if spec.Networks != nil && spec.Networks.WorkersConfiguration == nil && spec.Networks.Workers == "" {
 		allErrs = append(allErrs, fmt.Errorf("networks.workersConfiguration or networks.workers is a required field"))
 	}
 

@@ -343,7 +343,7 @@ func (vp *valuesProvider) getConfigChartValues(
 	zone := cpConfig.Zone
 
 	region := apis.GetRegionFromZone(zone)
-	if "" == region {
+	if region == "" {
 		region = cp.Spec.Region
 	}
 
@@ -379,7 +379,7 @@ func (vp *valuesProvider) getControlPlaneChartValues(
 	scaledDown bool,
 ) (map[string]interface{}, error) {
 	region := apis.GetRegionFromZone(cpConfig.Zone)
-	if "" == region {
+	if region == "" {
 		region = cp.Spec.Region
 	}
 

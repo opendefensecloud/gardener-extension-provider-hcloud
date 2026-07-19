@@ -103,15 +103,15 @@ func ExtractCredentials(secret *corev1.Secret) (*Credentials, error) {
 
 	ccmToken, err := extractToken(secret, HcloudTokenCCM)
 	if err != nil && hcloudErr != nil {
-		return nil, fmt.Errorf("Need either common or cloud controller manager specific Hcloud account credentials: %s, %s", hcloudErr, err)
+		return nil, fmt.Errorf("need either common or cloud controller manager specific Hcloud account credentials: %s, %s", hcloudErr, err)
 	}
 	csiToken, err := extractToken(secret, HcloudTokenCSI)
 	if err != nil && hcloudErr != nil {
-		return nil, fmt.Errorf("Need either common or container storage interface driver specific Hcloud account credentials: %s, %s", hcloudErr, err)
+		return nil, fmt.Errorf("need either common or container storage interface driver specific Hcloud account credentials: %s, %s", hcloudErr, err)
 	}
 	mcmToken, err := extractToken(secret, HcloudTokenMCM)
 	if err != nil && hcloudErr != nil {
-		return nil, fmt.Errorf("Need either common or machine controller manager specific Hcloud account credentials: %s, %s", hcloudErr, err)
+		return nil, fmt.Errorf("need either common or machine controller manager specific Hcloud account credentials: %s, %s", hcloudErr, err)
 	}
 
 	return &Credentials{

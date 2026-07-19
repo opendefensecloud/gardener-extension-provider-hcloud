@@ -135,7 +135,7 @@ func NewControllerManagerCommand(ctx context.Context) *cobra.Command {
 
 		RunE: func(cmdDefinition *cobra.Command, args []string) error {
 			if err := aggOption.Complete(); err != nil {
-				return fmt.Errorf("Error completing options: %w", err)
+				return fmt.Errorf("error completing options: %w", err)
 			}
 			if err := heartbeatCtrlOpts.Validate(); err != nil {
 				return err
@@ -149,24 +149,24 @@ func NewControllerManagerCommand(ctx context.Context) *cobra.Command {
 
 			mgr, err := manager.New(restOpts.Completed().Config, mgrOptions)
 			if err != nil {
-				return fmt.Errorf("Could not instantiate manager: %w", err)
+				return fmt.Errorf("could not instantiate manager: %w", err)
 			}
 
 			scheme := mgr.GetScheme()
 			if err := controller.AddToScheme(scheme); err != nil {
-				return fmt.Errorf("Could not update manager scheme: %w", err)
+				return fmt.Errorf("could not update manager scheme: %w", err)
 			}
 			if err := hcloudapisinstall.AddToScheme(scheme); err != nil {
-				return fmt.Errorf("Could not update manager scheme: %w", err)
+				return fmt.Errorf("could not update manager scheme: %w", err)
 			}
 			if err := druidv1alpha1.AddToScheme(scheme); err != nil {
-				return fmt.Errorf("Could not update manager scheme: %w", err)
+				return fmt.Errorf("could not update manager scheme: %w", err)
 			}
 			if err := machinev1alpha1.AddToScheme(scheme); err != nil {
-				return fmt.Errorf("Could not update manager scheme: %w", err)
+				return fmt.Errorf("could not update manager scheme: %w", err)
 			}
 			if err := autoscalingv1.AddToScheme(scheme); err != nil {
-				return fmt.Errorf("Could not update manager scheme: %w", err)
+				return fmt.Errorf("could not update manager scheme: %w", err)
 			}
 
 			// add common meta types to schema for controller-runtime to use v1.ListOptions
@@ -201,13 +201,13 @@ func NewControllerManagerCommand(ctx context.Context) *cobra.Command {
 			hcloudworker.DefaultAddOptions.GardenCluster = gardenCluster
 
 			if _, err := webhookOptions.Completed().AddToManager(ctx, mgr, nil); err != nil {
-				return fmt.Errorf("Could not add webhooks to manager: %w", err)
+				return fmt.Errorf("could not add webhooks to manager: %w", err)
 			}
 
 			hcloudcontrolplane.DefaultAddOptions.WebhookServerNamespace = webhookOptions.Server.Namespace
 
 			if err := controllerSwitches.Completed().AddToManager(ctx, mgr); err != nil {
-				return fmt.Errorf("Could not add controllers to manager: %w", err)
+				return fmt.Errorf("could not add controllers to manager: %w", err)
 			}
 
 			if err := mgr.AddHealthzCheck("ping", healthz.Ping); err != nil {
@@ -223,7 +223,7 @@ func NewControllerManagerCommand(ctx context.Context) *cobra.Command {
 			}
 
 			if err := mgr.Start(ctx); err != nil {
-				return fmt.Errorf("Error running manager: %w", err)
+				return fmt.Errorf("error running manager: %w", err)
 			}
 
 			return nil

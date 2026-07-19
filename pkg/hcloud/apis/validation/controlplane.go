@@ -25,7 +25,7 @@ import (
 )
 
 // ValidateControlPlaneConfig validates a ControlPlaneConfig object.
-func ValidateControlPlaneConfig(controlPlaneConfig *apis.ControlPlaneConfig, allowedZones, workerZones sets.String, version string, fldPath *field.Path) field.ErrorList {
+func ValidateControlPlaneConfig(controlPlaneConfig *apis.ControlPlaneConfig, allowedZones, workerZones sets.Set[string], version string, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 
 	if len(controlPlaneConfig.Zone) == 0 {

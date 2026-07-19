@@ -61,7 +61,7 @@ func DecodeCloudProfileConfigWithDecoder(decoder runtime.Decoder, profile *runti
 // CloudProfileConfig from the ProviderConfig section of the given Cluster.
 func DecodeCloudProfileConfigFromControllerCluster(cluster *controller.Cluster) (*apis.CloudProfileConfig, error) {
 	if cluster == nil || cluster.CloudProfile == nil {
-		return nil, errors.New("Missing cluster cloud profile")
+		return nil, errors.New("missing cluster cloud profile")
 	}
 
 	cpConfig, err := DecodeConfigFromCloudProfile(cluster.CloudProfile)
@@ -92,7 +92,7 @@ func DecodeCloudProfileConfigFromGardenContext(ctx context.Context, webhookconte
 // ProviderConfig section of the given CloudProfile.
 func DecodeConfigFromCloudProfile(profile *v1beta1.CloudProfile) (*apis.CloudProfileConfig, error) {
 	if profile == nil {
-		return nil, errors.New("Missing cloud profile")
+		return nil, errors.New("missing cloud profile")
 	}
 
 	cpConfig, err := DecodeCloudProfileConfig(profile.Spec.ProviderConfig)
@@ -115,7 +115,7 @@ func DecodeMachineImageNameFromCloudProfile(cpConfig *apis.CloudProfileConfig, i
 			for _, version := range machineImage.Versions {
 				if imageVersion == version.Version {
 					imageNameFound := version.ImageName
-					if "" == imageNameFound {
+					if imageNameFound == "" {
 						imageNameFound = fmt.Sprintf("%s-%s", machineImage.Name, version.Version)
 					}
 
@@ -125,5 +125,5 @@ func DecodeMachineImageNameFromCloudProfile(cpConfig *apis.CloudProfileConfig, i
 		}
 	}
 
-	return "", fmt.Errorf("Could not find an image for name %q in version %q", imageName, imageVersion)
+	return "", fmt.Errorf("could not find an image for name %q in version %q", imageName, imageVersion)
 }

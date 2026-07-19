@@ -44,7 +44,7 @@ func (cp *cloudProfile) Validate(_ context.Context, new, _ client.Object) error 
 
 	for _, region := range cloudProfile.Spec.Regions {
 		if len(region.Zones) > 1 {
-			return fmt.Errorf("This version of the hcloud extension does not support multiple zones per region. Consider implementing this feature.")
+			return fmt.Errorf("this version of the hcloud extension does not support multiple zones per region; consider implementing this feature")
 		}
 	}
 
