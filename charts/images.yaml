@@ -20,9 +20,9 @@ images:
   repository: docker.io/hetznercloud/hcloud-cloud-controller-manager
   tag: v1.33.0 # renovate: datasource=github-releases depName=hetznercloud/hcloud-cloud-controller-manager
 - name: machine-controller-manager-provider-hcloud
-  sourceRepository: https://github.com/christianhuening/machine-controller-manager-provider-hcloud
-  repository: ghcr.io/christianhuening/machine-controller-manager-provider-hcloud
-  tag: v0.3.2-odp.1 # renovate: datasource=github-releases depName=christianhuening/machine-controller-manager-provider-hcloud
+  sourceRepository: https://github.com/opendefensecloud/machine-controller-manager-provider-hcloud
+  repository: ghcr.io/opendefensecloud/machine-controller-manager-provider-hcloud
+  tag: v0.3.2-odp.1 # renovate: datasource=github-releases depName=opendefensecloud/machine-controller-manager-provider-hcloud
 - name: csi-driver-controller
   sourceRepository: https://github.com/hetznercloud/csi-driver
   repository: docker.io/hetznercloud/hcloud-csi-driver

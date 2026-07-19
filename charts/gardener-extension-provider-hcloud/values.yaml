@@ -1,5 +1,5 @@
 image:
-  repository: ghcr.io/23technologies/gardener-extension-provider-hcloud
+  repository: ghcr.io/opendefensecloud/gardener-extension-provider-hcloud
   tag: latest
   pullPolicy: IfNotPresent
 
