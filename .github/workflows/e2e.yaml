@@ -10,11 +10,11 @@ jobs:
     name: "End-to-End test"
     steps:
       - name: Checkout source
-        uses: actions/checkout@v7.0.0
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: install Dependencies
         run: sudo apt-get update && sudo apt-get install -y apache2 git curl make jq openssh-client
       - name: Setup Go
-        uses: actions/setup-go@v7.0.0
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: go.mod
       - name: Setup Gardener kubeconfig
@@ -33,7 +33,7 @@ jobs:
         run: |
           bash hack/ci/01-shoot-for-seed.sh
       - name: Prepare and start Gardener
-        uses: nick-fields/retry@v4.0.0
+        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
         env:
           CI: false
         with:

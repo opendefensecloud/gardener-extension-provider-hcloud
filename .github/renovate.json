@@ -19,7 +19,8 @@
     "enabledManagers": [
         "gomod",
         "custom.regex",
-        "github-actions"
+        "github-actions",
+        "dockerfile"
     ],
     "prCreation": "immediate",
     "recreateWhen": "always",
