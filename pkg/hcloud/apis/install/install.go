@@ -21,8 +21,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 
-	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis"
-	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis/v1alpha1"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis/v1alpha1"
 )
 
 var (

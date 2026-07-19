@@ -35,10 +35,10 @@ import (
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
 	fakeclient "sigs.k8s.io/controller-runtime/pkg/client/fake"
 
-	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis"
-	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis/mock"
-	mockmanager "github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis/mock/manager"
-	hcloudv1alpha1 "github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis/v1alpha1"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis/mock"
+	mockmanager "github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis/mock/manager"
+	hcloudv1alpha1 "github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis/v1alpha1"
 )
 
 var (

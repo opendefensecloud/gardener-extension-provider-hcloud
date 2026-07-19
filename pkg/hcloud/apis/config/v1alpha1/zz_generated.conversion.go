@@ -12,8 +12,8 @@ package v1alpha1
 import (
 	unsafe "unsafe"
 
-	config "github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis/config"
 	apisconfigv1alpha1 "github.com/gardener/gardener/extensions/pkg/apis/config/v1alpha1"
+	config "github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis/config"
 	resource "k8s.io/apimachinery/pkg/api/resource"
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	runtime "k8s.io/apimachinery/pkg/runtime"

@@ -24,7 +24,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/manager/signals"
 
-	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/cmd/controller"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/cmd/controller"
 )
 
 // main is the executable entry point.

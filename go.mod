@@ -1,4 +1,4 @@
-module github.com/23technologies/gardener-extension-provider-hcloud
+module github.com/opendefensecloud/gardener-extension-provider-hcloud
 
 go 1.26.2
 

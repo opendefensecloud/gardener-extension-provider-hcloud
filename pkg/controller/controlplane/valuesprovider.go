@@ -47,10 +47,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 
-	"github.com/23technologies/gardener-extension-provider-hcloud/charts"
-	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud"
-	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis"
-	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis/transcoder"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/charts"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis/transcoder"
 )
 
 const (

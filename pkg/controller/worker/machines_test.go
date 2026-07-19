@@ -35,11 +35,11 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/23technologies/gardener-extension-provider-hcloud/charts"
-	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis"
-	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis/mock"
-	mockclient "github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis/mock/client"
-	hcloudv1alpha1 "github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis/v1alpha1"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/charts"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis/mock"
+	mockclient "github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis/mock/client"
+	hcloudv1alpha1 "github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis/v1alpha1"
 )
 
 // newWorkerDelegate creates a new context for a worker reconciliation.

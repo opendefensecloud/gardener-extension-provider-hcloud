@@ -21,8 +21,8 @@ package validation
 import (
 	"fmt"
 
-	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis"
-	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis/mock"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis/mock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/ginkgo/v2/extensions/table"
 	. "github.com/onsi/gomega"

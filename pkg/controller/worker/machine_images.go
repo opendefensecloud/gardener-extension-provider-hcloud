@@ -24,9 +24,9 @@ import (
 	"github.com/gardener/gardener/extensions/pkg/controller/worker"
 	hcloudclient "github.com/hetznercloud/hcloud-go/v2/hcloud"
 
-	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud"
-	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis"
-	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis/transcoder"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis/transcoder"
 )
 
 // findMachineImageName returns the image name for the given name and version values.

@@ -20,8 +20,8 @@ package controller
 import (
 	"github.com/gardener/gardener/extensions/pkg/controller"
 
-	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis"
-	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis/transcoder"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis/transcoder"
 )
 
 func GetCloudProfileConfigFromControllerCluster(cluster *controller.Cluster) (*apis.CloudProfileConfig, error) {

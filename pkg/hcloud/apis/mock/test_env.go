@@ -26,7 +26,7 @@ import (
 	"github.com/onsi/ginkgo/v2"
 	gomock "go.uber.org/mock/gomock"
 
-	mockclient "github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis/mock/client"
+	mockclient "github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis/mock/client"
 )
 
 const (

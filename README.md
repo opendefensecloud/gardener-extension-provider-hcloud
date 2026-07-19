@@ -14,7 +14,7 @@ This way, we can keep Gardener core clean and independent.
 
 This controller implements Gardener's extension contract for the Hetzner cloud provider.
 
-The latest release's `ControllerRegistration` resource that can be used to register this controller to Gardener can be found [here](https://github.com/23technologies/gardener-extension-provider-hcloud/releases/latest/download/controller-registration.yaml).
+The latest release's `ControllerRegistration` resource that can be used to register this controller to Gardener can be found [here](https://github.com/opendefensecloud/gardener-extension-provider-hcloud/releases/latest/download/controller-registration.yaml).
 
 Please find more information regarding the extensibility concepts and a detailed proposal [here](https://github.com/gardener/gardener/blob/master/docs/proposals/01-extensibility.md).
 
@@ -42,7 +42,7 @@ Static code checks and tests can be executed by running `VERIFY=true make all`. 
 
 ## Feedback and Support
 
-Feedback and contributions are always welcome. Please report bugs or suggestions as [GitHub issues](https://github.com/23technologies/gardener-extension-provider-hcloud/issues) or join our [Slack channel #gardener](https://kubernetes.slack.com/messages/gardener) (please invite yourself to the Kubernetes workspace [here](http://slack.k8s.io)).
+Feedback and contributions are always welcome. Please report bugs or suggestions as [GitHub issues](https://github.com/opendefensecloud/gardener-extension-provider-hcloud/issues) or join our [Slack channel #gardener](https://kubernetes.slack.com/messages/gardener) (please invite yourself to the Kubernetes workspace [here](http://slack.k8s.io)).
 
 ## Learn more!
 
