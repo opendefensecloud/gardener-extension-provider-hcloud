@@ -39,14 +39,14 @@ import (
 func EnsureNetworks(ctx context.Context, client *hcloud.Client, namespace, zone string, networks *apis.InfrastructureConfigNetworks) (int64, error) {
 	workersConfiguration := networks.WorkersConfiguration
 
-	if nil == workersConfiguration && "" != networks.Workers {
+	if workersConfiguration == nil && networks.Workers != "" {
 		workersConfiguration = &apis.InfrastructureConfigNetwork{
 			Cidr: networks.Workers,
 		}
 	}
 
 	if nil != workersConfiguration {
-		if "" == workersConfiguration.Zone {
+		if workersConfiguration.Zone == "" {
 			locationName := apis.GetRegionFromZone(zone)
 
 			locations, err := client.Location.All(ctx)
@@ -61,8 +61,8 @@ func EnsureNetworks(ctx context.Context, client *hcloud.Client, namespace, zone 
 				}
 			}
 
-			if "" == workersConfiguration.Zone {
-				return -1, fmt.Errorf("Failed to find matching location for zone %q", zone)
+			if workersConfiguration.Zone == "" {
+				return -1, fmt.Errorf("failed to find matching location for zone %q", zone)
 			}
 		}
 
@@ -111,7 +111,7 @@ func EnsureNetworks(ctx context.Context, client *hcloud.Client, namespace, zone 
 // namespace string                               Shoot namespace
 // networks  *apis.InfrastructureConfigNetworkIDs Network IDs struct
 func EnsureNetworksDeleted(ctx context.Context, client *hcloud.Client, namespace string, networks *apis.InfrastructureConfigNetworkIDs) error {
-	if networks != nil && "" != networks.Workers {
+	if networks != nil && networks.Workers != "" {
 		name := fmt.Sprintf("%s-workers", namespace)
 
 		network, _, err := client.Network.GetByName(ctx, name)

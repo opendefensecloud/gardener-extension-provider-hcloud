@@ -29,7 +29,6 @@ import (
 	corev1beta1 "github.com/gardener/gardener/pkg/apis/core/v1beta1"
 	"github.com/gardener/gardener/pkg/client/kubernetes"
 	machinev1alpha1 "github.com/gardener/machine-controller-manager/pkg/apis/machine/v1alpha1"
-	mcmv1alpha1 "github.com/gardener/machine-controller-manager/pkg/apis/machine/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -47,12 +46,12 @@ func (w *workerDelegate) MachineClassKind() string {
 
 // MachineClass yields a newly initialized MachineClass object.
 func (w *workerDelegate) MachineClass() client.Object {
-	return &mcmv1alpha1.MachineClass{}
+	return &machinev1alpha1.MachineClass{}
 }
 
 // MachineClassList yields a newly initialized MachineClassList object.
 func (w *workerDelegate) MachineClassList() client.ObjectList {
-	return &mcmv1alpha1.MachineClassList{}
+	return &machinev1alpha1.MachineClassList{}
 }
 
 // DeployMachineClasses generates and creates the HCloud specific machine classes.
@@ -138,7 +137,7 @@ func (w *workerDelegate) generateMachineConfig(ctx context.Context) error {
 
 	sshFingerprint := infraStatus.SSHFingerprint
 
-	if "" == sshFingerprint {
+	if sshFingerprint == "" {
 		sshFingerprint, err = apis.GetSSHFingerprint(w.worker.Spec.SSHPublicKey)
 		if err != nil {
 			return err
@@ -205,7 +204,7 @@ func (w *workerDelegate) generateMachineConfig(ctx context.Context) error {
 				machineClassSpec["placementGroupID"] = placementGroupID
 			}
 
-			if "" != infraStatus.FloatingPoolName {
+			if infraStatus.FloatingPoolName != "" {
 				machineClassSpec["floatingPoolName"] = infraStatus.FloatingPoolName
 			}
 

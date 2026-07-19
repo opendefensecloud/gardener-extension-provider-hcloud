@@ -92,7 +92,7 @@ func NewAdmissionCommand(ctx context.Context) *cobra.Command {
 
 		RunE: func(cmdDefinition *cobra.Command, args []string) error {
 			if err := aggOption.Complete(); err != nil {
-				return fmt.Errorf("Error completing options: %w", err)
+				return fmt.Errorf("error completing options: %w", err)
 			}
 
 			util.ApplyClientConnectionConfigurationToRESTConfig(&componentbaseconfigv1alpha1.ClientConnectionConfiguration{
@@ -127,13 +127,13 @@ func NewAdmissionCommand(ctx context.Context) *cobra.Command {
 
 			mgr, err := manager.New(restOpts.Completed().Config, managerOptions)
 			if err != nil {
-				return fmt.Errorf("Could not instantiate manager: %w", err)
+				return fmt.Errorf("could not instantiate manager: %w", err)
 			}
 
 			install.Install(mgr.GetScheme())
 
 			if err := hcloudapisinstall.AddToScheme(mgr.GetScheme()); err != nil {
-				return fmt.Errorf("Could not update manager scheme: %w", err)
+				return fmt.Errorf("could not update manager scheme: %w", err)
 			}
 
 			var sourceCluster cluster.Cluster

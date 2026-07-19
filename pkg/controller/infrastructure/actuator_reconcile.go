@@ -74,7 +74,7 @@ func (a *actuator) reconcile(ctx context.Context, infra *extensionsv1alpha1.Infr
 		SSHFingerprint: sshFingerprint,
 	}
 
-	if "" != infraConfig.FloatingPoolName {
+	if infraConfig.FloatingPoolName != "" {
 		infraStatus.FloatingPoolName = infraConfig.FloatingPoolName
 	}
 

@@ -97,7 +97,7 @@ func EnsureSSHPublicKey(ctx context.Context, client *hcloud.Client, cluster *ext
 // client      *hcloud.Client   HCloud client
 // fingerprint string           SSH fingerprint
 func EnsureSSHPublicKeyDeleted(ctx context.Context, client *hcloud.Client, fingerprint string) error {
-	if "" != fingerprint {
+	if fingerprint != "" {
 		sshKey, _, err := client.SSHKey.GetByFingerprint(ctx, fingerprint)
 		if nil != err {
 			return err
