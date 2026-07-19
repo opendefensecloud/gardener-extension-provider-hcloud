@@ -25,9 +25,9 @@ import (
 	extensionsv1alpha1 "github.com/gardener/gardener/pkg/apis/extensions/v1alpha1"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 
-	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis"
-	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis/controller"
-	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis/transcoder"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis/controller"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis/transcoder"
 )
 
 // EnsureSSHPublicKey verifies that the SSH public key resource requested is available.

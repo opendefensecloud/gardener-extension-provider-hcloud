@@ -20,4 +20,4 @@ limitations under the License.
 //go:generate ../../../../hack/update-codegen.sh
 
 // Package config provides hcloud.provider.extensions.config.gardener.cloud
-package config // import "github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis/config"
+package config // import "github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis/config"

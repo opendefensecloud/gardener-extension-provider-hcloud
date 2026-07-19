@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 // +k8s:deepcopy-gen=package
-// +k8s:conversion-gen=github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis
+// +k8s:conversion-gen=github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis
 // +k8s:openapi-gen=true
 // +k8s:defaulter-gen=TypeMeta
 // +groupName=hcloud.provider.extensions.gardener.cloud
@@ -23,4 +23,4 @@ limitations under the License.
 //go:generate ../../../../hack/update-codegen.sh
 
 // Package v1alpha1 contains the HCloud provider API resources.
-package v1alpha1 // import "github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis/v1alpha1"
+package v1alpha1 // import "github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis/v1alpha1"

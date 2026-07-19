@@ -28,18 +28,18 @@ import (
 	"github.com/gardener/gardener/pkg/apis/extensions/v1alpha1"
 	gardenerclient "github.com/gardener/gardener/pkg/client/kubernetes"
 	mockkubernetes "github.com/gardener/gardener/pkg/client/kubernetes/mock"
-	mockclient "github.com/gardener/gardener/third_party/mock/controller-runtime/client"
-	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"go.uber.org/mock/gomock"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	k8sclient "sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/23technologies/gardener-extension-provider-hcloud/charts"
-	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis"
-	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis/mock"
-	hcloudv1alpha1 "github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis/v1alpha1"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/charts"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis/mock"
+	mockclient "github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis/mock/client"
+	hcloudv1alpha1 "github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis/v1alpha1"
 )
 
 // newWorkerDelegate creates a new context for a worker reconciliation.
@@ -112,7 +112,7 @@ var _ = Describe("Machines", func() {
 			expect expect
 		}
 
-		machineClassName := fmt.Sprintf("%s-%s-%s-%s", mock.TestNamespace, mock.TestWorkerPoolName, mock.TestZone, "2ef7b")
+		machineClassName := fmt.Sprintf("%s-%s-%s-%s", mock.TestNamespace, mock.TestWorkerPoolName, mock.TestZone, "48c9a")
 
 		DescribeTable("##table",
 			func(data *data) {

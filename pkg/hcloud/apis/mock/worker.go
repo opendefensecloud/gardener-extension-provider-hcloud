@@ -29,6 +29,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	"k8s.io/utils/ptr"
 )
 
 const (
@@ -48,6 +49,7 @@ const (
 	TestWorkerUserData              = "IyEvYmluL2Jhc2gKCmVjaG8gImhlbGxvIHdvcmxkIgo="
 	TestUserDataSecretName          = "user-data-secret-name"
 	TestUserDataSecretDataKey       = "user-data-secret-data-key"
+	TestNodeAgentSecretName         = "gardener-node-agent-hcloud-pool-1-77c1a"
 )
 
 // NewWorker generates a new provider specification for testing purposes.
@@ -82,6 +84,7 @@ func NewWorker() *v1alpha1.Worker {
 						LocalObjectReference: corev1.LocalObjectReference{Name: TestUserDataSecretName},
 						Key:                  TestUserDataSecretDataKey,
 					},
+					NodeAgentSecretName: ptr.To(TestNodeAgentSecretName),
 					Zones: []string{
 						TestZone,
 					},

@@ -21,7 +21,7 @@ import (
 	"github.com/gardener/gardener/pkg/utils/imagevector"
 	"k8s.io/apimachinery/pkg/util/runtime"
 
-	"github.com/23technologies/gardener-extension-provider-hcloud/charts"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/charts"
 )
 
 var imageVector imagevector.ImageVector

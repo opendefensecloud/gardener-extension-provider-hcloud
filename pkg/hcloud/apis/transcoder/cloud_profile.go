@@ -27,7 +27,7 @@ import (
 	"github.com/gardener/gardener/pkg/apis/core/v1beta1"
 	"k8s.io/apimachinery/pkg/runtime"
 
-	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis"
 )
 
 // DecodeCloudProfileConfig extracts the CloudProfileConfig from the given

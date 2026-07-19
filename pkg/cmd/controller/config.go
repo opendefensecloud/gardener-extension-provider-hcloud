@@ -20,11 +20,11 @@ package controller
 import (
 	"fmt"
 
-	extensionconfig "github.com/gardener/gardener/extensions/pkg/apis/config"
+	healthcheckconfigv1alpha1 "github.com/gardener/gardener/extensions/pkg/apis/config/v1alpha1"
 	"github.com/spf13/pflag"
 
-	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis/config"
-	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis/config/loader"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis/config"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis/config/loader"
 )
 
 // ConfigOptions are command line options that can be set for config.ControllerConfiguration.
@@ -124,7 +124,7 @@ func (c *Config) Options() config.ControllerConfiguration {
 //
 // PARAMETERS
 // config *healthcheckconfig.HealthCheckConfig Pointer to the HealthCheckConfig to set
-func (c *Config) ApplyHealthCheckConfig(config *extensionconfig.HealthCheckConfig) {
+func (c *Config) ApplyHealthCheckConfig(config *healthcheckconfigv1alpha1.HealthCheckConfig) {
 	if c.Config.HealthCheckConfig != nil {
 		*config = *c.Config.HealthCheckConfig
 	}

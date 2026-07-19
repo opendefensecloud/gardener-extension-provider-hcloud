@@ -12,8 +12,8 @@ package v1alpha1
 import (
 	unsafe "unsafe"
 
-	apis "github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis"
 	hcloud "github.com/hetznercloud/hcloud-go/v2/hcloud"
+	apis "github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis"
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )

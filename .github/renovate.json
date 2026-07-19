@@ -18,7 +18,8 @@
     "forkProcessing": "enabled",
     "enabledManagers": [
         "gomod",
-        "custom.regex"
+        "custom.regex",
+        "github-actions"
     ],
     "prCreation": "immediate",
     "recreateWhen": "always",
@@ -62,10 +63,63 @@
             "matchManagers": [
                 "gomod"
             ],
-            "automerge": true,
             "addLabels": [
                 "go module"
             ]
+        },
+        {
+            "matchManagers": [
+                "gomod"
+            ],
+            "groupName": "gardener",
+            "matchPackageNames": [
+                "github.com/gardener/gardener",
+                "github.com/gardener/gardener/pkg/apis",
+                "github.com/gardener/gardener/hack/tools"
+            ]
+        },
+        {
+            "matchManagers": [
+                "gomod"
+            ],
+            "matchPackageNames": [
+                "k8s.io/api",
+                "k8s.io/apiextensions-apiserver",
+                "k8s.io/apimachinery",
+                "k8s.io/apiserver",
+                "k8s.io/client-go",
+                "k8s.io/code-generator",
+                "k8s.io/component-base",
+                "k8s.io/kubelet"
+            ],
+            "allowedVersions": "<0.36.0"
+        },
+        {
+            "matchManagers": [
+                "gomod"
+            ],
+            "matchPackageNames": [
+                "sigs.k8s.io/controller-runtime"
+            ],
+            "allowedVersions": "<0.24.0"
+        },
+        {
+            "matchManagers": [
+                "gomod"
+            ],
+            "matchPackageNames": [
+                "sigs.k8s.io/controller-tools"
+            ],
+            "allowedVersions": "<0.21.0"
+        },
+        {
+            "matchManagers": [
+                "gomod"
+            ],
+            "matchPackageNames": [
+                "k8s.io/autoscaler/vertical-pod-autoscaler"
+            ],
+            "allowedVersions": "<1.7.0"
         },
         {
             "matchFileNames": [

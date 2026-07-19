@@ -1,6 +1,6 @@
 # Deployment of the HCloud provider extension
 
-**Disclaimer:** This document is NOT a step by step installation guide for the HCloud provider extension and only contains some configuration specifics regarding the installation of different components via the helm charts residing in the HCloud provider extension [repository](https://github.com/23technologies/gardener-extension-provider-hcloud).
+**Disclaimer:** This document is NOT a step by step installation guide for the HCloud provider extension and only contains some configuration specifics regarding the installation of different components via the helm charts residing in the HCloud provider extension [repository](https://github.com/opendefensecloud/gardener-extension-provider-hcloud).
 
 ## gardener-extension-admission-hcloud
 

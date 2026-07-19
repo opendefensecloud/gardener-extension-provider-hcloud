@@ -25,10 +25,10 @@ import (
 	"github.com/gardener/gardener/extensions/pkg/controller/infrastructure"
 	"github.com/gardener/gardener/extensions/pkg/controller/worker"
 
-	hcloudcontrolplane "github.com/23technologies/gardener-extension-provider-hcloud/pkg/controller/controlplane"
-	hcloudhealthcheck "github.com/23technologies/gardener-extension-provider-hcloud/pkg/controller/healthcheck"
-	hcloudinfrastructure "github.com/23technologies/gardener-extension-provider-hcloud/pkg/controller/infrastructure"
-	hcloudworker "github.com/23technologies/gardener-extension-provider-hcloud/pkg/controller/worker"
+	hcloudcontrolplane "github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/controller/controlplane"
+	hcloudhealthcheck "github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/controller/healthcheck"
+	hcloudinfrastructure "github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/controller/infrastructure"
+	hcloudworker "github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/controller/worker"
 )
 
 // controllerSwitchOptions are the cmd.SwitchOptions for the provider controllers.

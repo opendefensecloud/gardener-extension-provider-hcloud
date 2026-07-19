@@ -36,18 +36,18 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/spf13/cobra"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	autoscalingv1beta2 "k8s.io/autoscaler/vertical-pod-autoscaler/pkg/apis/autoscaling.k8s.io/v1beta2"
+	autoscalingv1 "k8s.io/autoscaler/vertical-pod-autoscaler/pkg/apis/autoscaling.k8s.io/v1"
 	"k8s.io/component-base/version/verflag"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 
-	hcloudcontrolplane "github.com/23technologies/gardener-extension-provider-hcloud/pkg/controller/controlplane"
-	hcloudhealthcheck "github.com/23technologies/gardener-extension-provider-hcloud/pkg/controller/healthcheck"
-	hcloudinfrastructure "github.com/23technologies/gardener-extension-provider-hcloud/pkg/controller/infrastructure"
-	hcloudworker "github.com/23technologies/gardener-extension-provider-hcloud/pkg/controller/worker"
-	"github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud"
-	hcloudapisinstall "github.com/23technologies/gardener-extension-provider-hcloud/pkg/hcloud/apis/install"
+	hcloudcontrolplane "github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/controller/controlplane"
+	hcloudhealthcheck "github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/controller/healthcheck"
+	hcloudinfrastructure "github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/controller/infrastructure"
+	hcloudworker "github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/controller/worker"
+	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud"
+	hcloudapisinstall "github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis/install"
 )
 
 // NewControllerManagerCommand creates a new command for running a HCloud provider controller.
@@ -106,6 +106,7 @@ func NewControllerManagerCommand(ctx context.Context) *cobra.Command {
 	webhookOptions := webhookcmd.NewAddToManagerOptions(hcloud.Name,
 		genericactuator.ShootWebhooksResourceName,
 		genericactuator.ShootWebhookNamespaceSelector(hcloud.Type),
+		generalOpts,
 		webhookServerOptions,
 		webhookSwitches,
 	)
@@ -164,7 +165,7 @@ func NewControllerManagerCommand(ctx context.Context) *cobra.Command {
 			if err := machinev1alpha1.AddToScheme(scheme); err != nil {
 				return fmt.Errorf("Could not update manager scheme: %w", err)
 			}
-			if err := autoscalingv1beta2.AddToScheme(scheme); err != nil {
+			if err := autoscalingv1.AddToScheme(scheme); err != nil {
 				return fmt.Errorf("Could not update manager scheme: %w", err)
 			}
 
@@ -189,9 +190,12 @@ func NewControllerManagerCommand(ctx context.Context) *cobra.Command {
 			heartbeatCtrlOpts.Completed().Apply(&heartbeat.DefaultAddOptions)
 			controlPlaneCtrlOpts.Completed().Apply(&hcloudcontrolplane.DefaultAddOptions.Controller)
 			infraCtrlOpts.Completed().Apply(&hcloudinfrastructure.DefaultAddOptions.Controller)
-			reconcileOpts.Completed().Apply(&hcloudinfrastructure.DefaultAddOptions.IgnoreOperationAnnotation, &hcloudinfrastructure.DefaultAddOptions.ExtensionClass)
-			reconcileOpts.Completed().Apply(&hcloudcontrolplane.DefaultAddOptions.IgnoreOperationAnnotation, &hcloudcontrolplane.DefaultAddOptions.ExtensionClass)
-			reconcileOpts.Completed().Apply(&hcloudworker.DefaultAddOptions.IgnoreOperationAnnotation, &hcloudworker.DefaultAddOptions.ExtensionClass)
+			reconcileOpts.Completed().Apply(&hcloudinfrastructure.DefaultAddOptions.IgnoreOperationAnnotation)
+			reconcileOpts.Completed().Apply(&hcloudcontrolplane.DefaultAddOptions.IgnoreOperationAnnotation)
+			reconcileOpts.Completed().Apply(&hcloudworker.DefaultAddOptions.IgnoreOperationAnnotation)
+			hcloudinfrastructure.DefaultAddOptions.ExtensionClasses = generalOpts.Completed().ExtensionClasses
+			hcloudcontrolplane.DefaultAddOptions.ExtensionClasses = generalOpts.Completed().ExtensionClasses
+			hcloudworker.DefaultAddOptions.ExtensionClasses = generalOpts.Completed().ExtensionClasses
 			workerCtrlOpts.Completed().Apply(&hcloudworker.DefaultAddOptions.Controller)
 
 			hcloudworker.DefaultAddOptions.GardenCluster = gardenCluster
