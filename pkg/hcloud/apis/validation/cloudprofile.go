@@ -31,8 +31,36 @@ var validLoadBalancerSizeValues = sets.NewString("SMALL", "MEDIUM", "LARGE")
 var namePrefixPattern = regexp.MustCompile("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$")
 
 // ValidateCloudProfileConfig validates a CloudProfileConfig object.
-func ValidateCloudProfileConfig(profileSpec *gardencorev1beta1.CloudProfileSpec, profileConfig *apis.CloudProfileConfig) field.ErrorList {
+func ValidateCloudProfileConfig(_ *gardencorev1beta1.CloudProfileSpec, profileConfig *apis.CloudProfileConfig) field.ErrorList {
 	allErrs := field.ErrorList{}
+	providerConfigPath := field.NewPath("providerConfig")
+
+	if len(profileConfig.Regions) == 0 {
+		allErrs = append(allErrs, field.Required(providerConfigPath.Child("regions"), "must provide at least one region"))
+	}
+
+	machineImagesPath := providerConfigPath.Child("machineImages")
+	if len(profileConfig.MachineImages) == 0 {
+		allErrs = append(allErrs, field.Required(machineImagesPath, "must provide at least one machine image"))
+	}
+	for i, machineImage := range profileConfig.MachineImages {
+		idxPath := machineImagesPath.Index(i)
+		if len(machineImage.Name) == 0 {
+			allErrs = append(allErrs, field.Required(idxPath.Child("name"), "must provide a name"))
+		}
+		if len(machineImage.Versions) == 0 {
+			allErrs = append(allErrs, field.Required(idxPath.Child("versions"), "must provide at least one version"))
+		}
+		for j, version := range machineImage.Versions {
+			if len(version.Version) == 0 {
+				allErrs = append(allErrs, field.Required(idxPath.Child("versions").Index(j).Child("version"), "must provide a version"))
+			}
+		}
+	}
+
+	if len(profileConfig.DefaultStorageFsType) == 0 {
+		allErrs = append(allErrs, field.Required(providerConfigPath.Child("defaultStorageFsType"), "must provide a default storage filesystem type"))
+	}
 
 	return allErrs
 }

@@ -22,6 +22,7 @@ import (
 
 	"github.com/gardener/gardener/pkg/apis/core"
 	gardencorev1beta1 "github.com/gardener/gardener/pkg/apis/core/v1beta1"
+	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis"
@@ -35,6 +36,12 @@ func ValidateInfrastructureConfig(infraConfig *apis.InfrastructureConfig, nodes 
 
 func ValidateInfrastructureConfigUpdate(oldInfraConfig *apis.InfrastructureConfig, infraConfig *apis.InfrastructureConfig) field.ErrorList {
 	allErrs := field.ErrorList{}
+
+	// The worker network configuration is immutable: changing the worker subnet
+	// after the infrastructure has been created would orphan the existing network
+	// and the nodes attached to it.
+	allErrs = append(allErrs, apivalidation.ValidateImmutableField(infraConfig.Networks, oldInfraConfig.Networks, field.NewPath("networks"))...)
+
 	return allErrs
 }
 

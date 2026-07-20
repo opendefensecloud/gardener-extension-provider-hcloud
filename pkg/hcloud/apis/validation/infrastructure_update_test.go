@@ -22,6 +22,7 @@ import (
 	gardencorev1beta1 "github.com/gardener/gardener/pkg/apis/core/v1beta1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/gstruct"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis"
@@ -53,8 +54,21 @@ var _ = Describe("InfrastructureConfig update validation", func() {
 			Expect(ValidateInfrastructureConfigUpdate(oldConfig, oldConfig)).To(BeEmpty())
 		})
 
-		It("should not return errors for a changed config", func() {
-			Expect(ValidateInfrastructureConfigUpdate(oldConfig, newConfig)).To(BeEmpty())
+		It("should reject a change to the immutable networks field", func() {
+			// newConfig changes the worker subnet (10.250.0.0/16 -> 10.251.0.0/16).
+			errList := ValidateInfrastructureConfigUpdate(oldConfig, newConfig)
+			Expect(errList).To(ConsistOf(
+				gstruct.PointTo(gstruct.MatchFields(gstruct.IgnoreExtras, gstruct.Fields{
+					"Type":  Equal(field.ErrorTypeInvalid),
+					"Field": Equal("networks"),
+				})),
+			))
+		})
+
+		It("should accept a change to a non-immutable field such as floatingPoolName", func() {
+			changed := oldConfig.DeepCopy()
+			changed.FloatingPoolName = "pool-changed"
+			Expect(ValidateInfrastructureConfigUpdate(oldConfig, changed)).To(BeEmpty())
 		})
 	})
 
