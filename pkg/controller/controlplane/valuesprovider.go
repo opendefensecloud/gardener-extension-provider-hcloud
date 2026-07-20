@@ -234,14 +234,8 @@ func (vp *valuesProvider) GetConfigChartValues(
 		return nil, err
 	}
 
-	// Get credentials
-	credentials, err := hcloud.GetCredentials(ctx, vp.client, cp.Spec.SecretRef)
-	if err != nil {
-		return nil, fmt.Errorf("could not get hcloud credentials from secret '%s/%s': %w", cp.Spec.SecretRef.Namespace, cp.Spec.SecretRef.Name, err)
-	}
-
 	// Get config chart values
-	return vp.getConfigChartValues(cpConfig, cp, cluster, credentials)
+	return vp.getConfigChartValues(cpConfig, cp, cluster)
 }
 
 // GetControlPlaneChartValues returns the values for the control plane chart applied by the generic actuator.
@@ -333,12 +327,10 @@ func (vp *valuesProvider) GetStorageClassesChartValues(
 // cpConfig    *apis.ControlPlaneConfig         Control plane config struct
 // cp          *extensionsv1alpha1.ControlPlane Control plane struct
 // cluster     *extensionscontroller.Cluster    Cluster struct
-// credentials *hcloud.Credentials              Credentials instance
 func (vp *valuesProvider) getConfigChartValues(
 	cpConfig *apis.ControlPlaneConfig,
 	cp *extensionsv1alpha1.ControlPlane,
 	cluster *extensionscontroller.Cluster,
-	credentials *hcloud.Credentials,
 ) (map[string]interface{}, error) {
 	zone := cpConfig.Zone
 
@@ -347,9 +339,13 @@ func (vp *valuesProvider) getConfigChartValues(
 		region = cp.Spec.Region
 	}
 
-	// Collect config chart values
+	// Collect config chart values. The hcloud API token is intentionally NOT
+	// rendered here: the CCM is started without --cloud-config and authenticates
+	// via the HCLOUD_TOKEN env var (sourced from the cloudprovider Secret), and
+	// the kubelet runs with --cloud-provider=external. Emitting the token into
+	// this ConfigMap (and thus the kubelet cloud-config on every node) only
+	// exposed it at rest without being used.
 	values := map[string]interface{}{
-		"token":  credentials.CCM().Token,
 		"region": region,
 		"zone":   zone,
 	}
