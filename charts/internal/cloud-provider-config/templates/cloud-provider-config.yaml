@@ -5,9 +5,6 @@ metadata:
   namespace: {{ .Release.Namespace }}
 data:
   cloudprovider.conf: |
-    global:
-      token: {{ .Values.token }}
-
     {{- if (or .Values.region .Values.zone) }}
     labels:
     {{- if .Values.region }}
