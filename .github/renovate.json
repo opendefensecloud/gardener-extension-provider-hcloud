@@ -93,7 +93,7 @@
                 "k8s.io/component-base",
                 "k8s.io/kubelet"
             ],
-            "allowedVersions": "<0.36.0"
+            "allowedVersions": "<0.37.0"
         },
         {
             "matchManagers": [
@@ -102,7 +102,7 @@
             "matchPackageNames": [
                 "sigs.k8s.io/controller-runtime"
             ],
-            "allowedVersions": "<0.24.0"
+            "allowedVersions": "<0.25.0"
         },
         {
             "matchManagers": [
