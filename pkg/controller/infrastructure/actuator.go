@@ -137,8 +137,11 @@ func (a *actuator) Reconcile(ctx context.Context, _ logr.Logger, infra *extensio
 // ctx     context.Context                    Execution context
 // infra   *extensionsv1alpha1.Infrastructure Infrastructure struct
 // cluster *extensionscontroller.Cluster      Cluster struct
-func (a *actuator) Restore(ctx context.Context, _ logr.Logger, infra *extensionsv1alpha1.Infrastructure, cluster *extensionscontroller.Cluster) error {
-	return nil
+func (a *actuator) Restore(ctx context.Context, log logr.Logger, infra *extensionsv1alpha1.Infrastructure, cluster *extensionscontroller.Cluster) error {
+	// After a control-plane migration the infrastructure resources still live in
+	// Hetzner Cloud, but the SSH key and worker network must be re-ensured and the
+	// provider status repopulated on the new seed. Run the same path as Reconcile.
+	return a.Reconcile(ctx, log, infra, cluster)
 }
 
 // updateProviderStatus updates the infrastructure provider status.
