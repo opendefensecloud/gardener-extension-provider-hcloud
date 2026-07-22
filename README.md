@@ -5,7 +5,7 @@ Its main principle is to leverage Kubernetes concepts for all of its tasks.
 
 With [GEP-1](https://github.com/gardener/gardener/blob/master/docs/proposals/01-extensibility.md), Gardener adopted an architecture in which vendor-specific logic lives in external controllers that implement Gardener's extension contract. This keeps Gardener core clean and provider-independent.
 
-This controller implements Gardener's extension contract for the **Hetzner Cloud** provider. It is maintained by [OpenDefenseCloud](https://github.com/opendefensecloud) as a fork of the (now unmaintained) 23technologies extension, kept in sync with current Gardener releases.
+This controller implements Gardener's extension contract for the **Hetzner Cloud** provider. It is maintained by [OpenDefenseCloud](https://github.com/opendefensecloud) as a fork of the 23technologies extension, kept in sync with current Gardener releases.
 
 The latest release ships a [`ControllerRegistration` resource](https://github.com/opendefensecloud/gardener-extension-provider-hcloud/releases/latest/download/controller-registration.yaml) used to register this controller with Gardener.
 
