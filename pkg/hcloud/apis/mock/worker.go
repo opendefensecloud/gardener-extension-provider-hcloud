@@ -111,10 +111,9 @@ func ManipulateWorker(worker *v1alpha1.Worker, data map[string]interface{}) *v1a
 			index, _ := strconv.Atoi(keyData[2])
 
 			manipulateStruct(&worker.Spec.Pools[index], keyData[3], value)
-		} else if strings.Index(key, "Spec.Pools.") == 0 {
-			manipulateStruct(&worker.Spec, key[7:], value)
-		} else if strings.Index(key, "Spec") == 0 {
-			manipulateStruct(&worker.Spec, key[7:], value)
+		} else if strings.Index(key, "Spec.") == 0 {
+			// Strip "Spec." — the remainder is the field path within WorkerSpec.
+			manipulateStruct(&worker.Spec, key[5:], value)
 		} else {
 			manipulateStruct(&worker, key, value)
 		}

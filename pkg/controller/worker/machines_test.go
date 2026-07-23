@@ -114,6 +114,32 @@ var _ = Describe("Machines", func() {
 
 		machineClassName := fmt.Sprintf("%s-%s-%s-%s", mock.TestNamespace, mock.TestWorkerPoolName, mock.TestZone, "48c9a")
 
+		// The single machine class the mock worker/cloud profile pair yields. Shared by the
+		// explicit-zones and defaulted-zones entries, which must produce identical output.
+		expectedMachineClasses := []map[string]interface{}{
+			{
+				"name": machineClassName,
+				"credentialsSecretRef": map[string]interface{}{
+					"name":      "secret",
+					"namespace": "test-namespace"},
+				"cluster":          mock.TestNamespace,
+				"zone":             mock.TestZone,
+				"imageName":        fmt.Sprintf("%s-%s", mock.TestWorkerMachineImageName, mock.TestWorkerMachineImageVersion),
+				"sshFingerprint":   mock.TestSSHFingerprint,
+				"machineType":      mock.TestWorkerMachineType,
+				"floatingPoolName": mock.TestFloatingPoolName,
+				"networkName":      fmt.Sprintf("%s-workers", mock.TestNamespace),
+				"tags": map[string]string{
+					"mcm.gardener.cloud/cluster": mock.TestNamespace,
+					"mcm.gardener.cloud/role":    "node",
+				},
+				"secret": map[string]interface{}{
+					"hcloudToken": []byte("dummy-token"),
+					"userData":    mock.TestWorkerUserData,
+				},
+			},
+		}
+
 		DescribeTable("##table",
 			func(data *data) {
 				chartApplier := mockkubernetes.NewMockChartApplier(mockTestEnv.MockController)
@@ -169,33 +195,13 @@ var _ = Describe("Machines", func() {
 				},
 				expect: expect{
 					errToHaveOccurred: false,
-					machineClasses: []map[string]interface{}{
-						{
-							"name": machineClassName,
-							"credentialsSecretRef": map[string]interface{}{
-								"name":      "secret",
-								"namespace": "test-namespace"},
-							"cluster":          mock.TestNamespace,
-							"zone":             mock.TestZone,
-							"imageName":        fmt.Sprintf("%s-%s", mock.TestWorkerMachineImageName, mock.TestWorkerMachineImageVersion),
-							"sshFingerprint":   mock.TestSSHFingerprint,
-							"machineType":      mock.TestWorkerMachineType,
-							"floatingPoolName": mock.TestFloatingPoolName,
-							"networkName":      fmt.Sprintf("%s-workers", mock.TestNamespace),
-							"tags": map[string]string{
-								"mcm.gardener.cloud/cluster": mock.TestNamespace,
-								"mcm.gardener.cloud/role":    "node",
-							},
-							"secret": map[string]interface{}{
-								"hcloudToken": []byte("dummy-token"),
-								"userData":    mock.TestWorkerUserData,
-							},
-						},
-					},
+					machineClasses:    expectedMachineClasses,
 				},
 			}),
 
-			Entry("should not generate machine classes because of missing zones", &data{
+			// A pool may legitimately omit zones (they are optional in the Shoot API). Deriving
+			// them from the cloud profile keeps the pool from silently producing no machines.
+			Entry("should default the zones from the cloud profile region when the pool has none", &data{
 				setup: setup{},
 				action: action{
 					mock.NewCluster(),
@@ -203,7 +209,22 @@ var _ = Describe("Machines", func() {
 				},
 				expect: expect{
 					errToHaveOccurred: false,
-					machineClasses:    nil,
+					machineClasses:    expectedMachineClasses,
+				},
+			}),
+
+			Entry("should fail when neither the pool nor the cloud profile region declares zones", &data{
+				setup: setup{},
+				action: action{
+					mock.NewCluster(),
+					mock.ManipulateWorker(mock.NewWorker(), map[string]interface{}{
+						"Spec.Pools.0.Zones": []string{},
+						"Spec.Region":        "nowhere",
+					}),
+				},
+				expect: expect{
+					err:               fmt.Errorf("worker pool %q specifies no zones and the cloud profile declares none for region %q", mock.TestWorkerPoolName, "nowhere"),
+					errToHaveOccurred: true,
 				},
 			}),
 			Entry("should fail because of invalid image name", &data{
@@ -287,7 +308,7 @@ var _ = Describe("Machines", func() {
 				},
 			}),
 
-			Entry("should not generate machine deployments because of missing zones", &data{
+			Entry("should default the zones from the cloud profile region when the pool has none", &data{
 				setup: setup{},
 				action: action{
 					mock.NewCluster(),
@@ -295,7 +316,22 @@ var _ = Describe("Machines", func() {
 				},
 				expect: expect{
 					errToHaveOccurred:          false,
-					numberOfMachineDeployments: 0,
+					numberOfMachineDeployments: 1,
+				},
+			}),
+
+			Entry("should fail when neither the pool nor the cloud profile region declares zones", &data{
+				setup: setup{},
+				action: action{
+					mock.NewCluster(),
+					mock.ManipulateWorker(mock.NewWorker(), map[string]interface{}{
+						"Spec.Pools.0.Zones": []string{},
+						"Spec.Region":        "nowhere",
+					}),
+				},
+				expect: expect{
+					err:               fmt.Errorf("worker pool %q specifies no zones and the cloud profile declares none for region %q", mock.TestWorkerPoolName, "nowhere"),
+					errToHaveOccurred: true,
 				},
 			}),
 			Entry("should fail because of invalid image name", &data{
