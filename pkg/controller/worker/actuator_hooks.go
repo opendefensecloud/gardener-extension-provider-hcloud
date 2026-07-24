@@ -44,8 +44,16 @@ func (w *workerDelegate) PreReconcileHook(ctx context.Context) error {
 	}
 
 	for _, pool := range w.worker.Spec.Pools {
+		// Zones are optional in the Shoot API; default them from the cloud profile region (same
+		// helper generateMachineConfig uses) so a zone-less pool does not panic here with an
+		// index-out-of-range before any machine class is ever created.
+		zones, err := w.poolZones(pool)
+		if err != nil {
+			return err
+		}
+
 		// currently there is only one zone per region on hetzner.
-		locationName := apis.GetRegionFromZone(pool.Zones[0])
+		locationName := apis.GetRegionFromZone(zones[0])
 
 		serverType, ok := serverTypesByName[pool.MachineType]
 		if !ok {
