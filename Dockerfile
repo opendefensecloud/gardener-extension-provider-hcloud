@@ -1,10 +1,16 @@
 # syntax=docker/dockerfile:1
 
 ############# builder
-FROM golang:1.26.5@sha256:ae5a2316d12f3e78fd99177dad452e6ad4f240af2d71d57b480c3477f250fec6 AS builder
+# Run the builder on the native build platform and cross-compile to the target
+# arch (GOOS/GOARCH below). This avoids QEMU emulation of the whole Go toolchain.
+FROM --platform=$BUILDPLATFORM golang:1.26.5@sha256:ae5a2316d12f3e78fd99177dad452e6ad4f240af2d71d57b480c3477f250fec6 AS builder
 
+ARG TARGETOS
+ARG TARGETARCH
 ENV BINARY_PATH=/go/bin \
-    CGO_ENABLED=0
+    CGO_ENABLED=0 \
+    GOOS=$TARGETOS \
+    GOARCH=$TARGETARCH
 WORKDIR /go/src/github.com/opendefensecloud/gardener-extension-provider-hcloud
 
 # cache deps before building and copying source so that we don't need to re-download as much
@@ -17,9 +23,12 @@ COPY . .
 
 ARG EFFECTIVE_VERSION
 
+# `go install` places cross-compiled binaries under $GOPATH/bin/$GOOS_$GOARCH;
+# flatten that subdir so the COPY paths below work for both native and cross builds.
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
-    make install EFFECTIVE_VERSION=$EFFECTIVE_VERSION
+    make install EFFECTIVE_VERSION=$EFFECTIVE_VERSION && \
+    if [ -d "/go/bin/${GOOS}_${GOARCH}" ]; then mv "/go/bin/${GOOS}_${GOARCH}/"* /go/bin/; fi
 
 ############# base
 FROM gcr.io/distroless/static-debian12:nonroot@sha256:aef9602f8710ec12bde19d593fed1f76c708531bb7aba205110f1029786ead7b AS base

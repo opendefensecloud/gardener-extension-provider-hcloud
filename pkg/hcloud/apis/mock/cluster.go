@@ -110,7 +110,7 @@ func NewCluster() *v1alpha1.Cluster {
 			CloudProfile: runtime.RawExtension{
 				Raw: []byte(TestClusterCloudProfile),
 			},
-			Seed: runtime.RawExtension{
+			Seed: &runtime.RawExtension{
 				Raw: []byte(TestClusterSeed),
 			},
 			Shoot: runtime.RawExtension{

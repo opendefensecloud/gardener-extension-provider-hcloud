@@ -144,10 +144,18 @@ var _ = Describe("ActuatorDelete", func() {
 	})
 
 	Describe("#Restore", func() {
-		It("should be a no-op and return nil (pins current behaviour)", func() {
-			// NOTE: Restore is currently a no-op - it performs no restoration and
-			// unconditionally returns nil. This test documents today's behaviour
-			// so that any future change is caught deliberately.
+		It("should reconcile the infrastructure (delegates to Reconcile)", func() {
+			// Restore re-ensures infrastructure after a control-plane migration by
+			// running the same path as Reconcile, so it needs the same mocks.
+			mockTestEnv.Client.EXPECT().Get(gomock.Any(), k8sclient.ObjectKey{Namespace: mock.TestNamespace, Name: mock.TestInfrastructureSecretName}, gomock.AssignableToTypeOf(&corev1.Secret{})).DoAndReturn(func(_ context.Context, _ k8sclient.ObjectKey, secret *corev1.Secret, _ ...k8sclient.GetOption) error {
+				secret.Data = map[string][]byte{
+					"hcloudToken": []byte("dummy-token"),
+				}
+				return nil
+			})
+			mockTestEnv.Client.EXPECT().Status().Return(sw).AnyTimes()
+			sw.EXPECT().Patch(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
+
 			err := infraActuator.Restore(ctx, logr.Logger{}, mock.NewInfrastructure(), cluster)
 			Expect(err).NotTo(HaveOccurred())
 		})
