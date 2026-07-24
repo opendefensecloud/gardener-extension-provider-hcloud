@@ -27,6 +27,7 @@ import (
 	genericworkeractuator "github.com/gardener/gardener/extensions/pkg/controller/worker/genericactuator"
 	gardencorev1beta1helper "github.com/gardener/gardener/pkg/api/core/v1beta1/helper"
 	corev1beta1 "github.com/gardener/gardener/pkg/apis/core/v1beta1"
+	extensionsv1alpha1 "github.com/gardener/gardener/pkg/apis/extensions/v1alpha1"
 	"github.com/gardener/gardener/pkg/client/kubernetes"
 	machinev1alpha1 "github.com/gardener/machine-controller-manager/pkg/apis/machine/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
@@ -109,6 +110,42 @@ func (w *workerDelegate) generateMachineClassSecretData(ctx context.Context) (ma
 	}, nil
 }
 
+// poolZones yields the availability zones the machines of a worker pool are distributed over.
+//
+// Zones are optional in the Shoot API, but this provider derives one machine class and one
+// machine deployment per zone, so a pool that leaves them unset would yield no machines at all.
+// Fall back to the zones the cloud profile declares for the worker's region, and fail loudly
+// when there are none rather than reconciling a node-less cluster.
+//
+// PARAMETERS
+// pool extensionsv1alpha1.WorkerPool Worker pool to resolve the zones for
+func (w *workerDelegate) poolZones(pool extensionsv1alpha1.WorkerPool) ([]string, error) {
+	if len(pool.Zones) > 0 {
+		return pool.Zones, nil
+	}
+
+	region := w.worker.Spec.Region
+
+	for _, cloudProfileRegion := range w.cluster.CloudProfile.Spec.Regions {
+		if cloudProfileRegion.Name != region {
+			continue
+		}
+
+		zones := make([]string, 0, len(cloudProfileRegion.Zones))
+		for _, zone := range cloudProfileRegion.Zones {
+			zones = append(zones, zone.Name)
+		}
+
+		if len(zones) > 0 {
+			return zones, nil
+		}
+
+		break
+	}
+
+	return nil, fmt.Errorf("worker pool %q specifies no zones and the cloud profile declares none for region %q", pool.Name, region)
+}
+
 // generateMachineConfig generates the machine config of the WorkerDelegate instance's spec.
 //
 // PARAMETERS
@@ -149,7 +186,16 @@ func (w *workerDelegate) generateMachineConfig(ctx context.Context) error {
 	}
 
 	for _, pool := range w.worker.Spec.Pools {
-		zoneLen := int32(len(pool.Zones)) // #nosec: G115 - We validate if num pool zones exceeds max_int32.
+		// A pool without zones would produce no machine classes at all, silently yielding a
+		// cluster with no nodes (and, on deletion, a Worker that hangs forever waiting for the
+		// machine class credentials secret to be acquired). Zones are optional in the Shoot API,
+		// so fall back to the ones the cloud profile declares for the worker's region.
+		zones, err := w.poolZones(pool)
+		if err != nil {
+			return err
+		}
+
+		zoneLen := int32(len(zones)) // #nosec: G115 - We validate if num pool zones exceeds max_int32.
 
 		workerPoolHash, err := worker.WorkerPoolHash(pool, w.cluster, nil, nil)
 		if err != nil {
@@ -171,7 +217,7 @@ func (w *workerDelegate) generateMachineConfig(ctx context.Context) error {
 			return err
 		}
 
-		for zoneIndex, zone := range pool.Zones {
+		for zoneIndex, zone := range zones {
 			zoneIdx := int32(zoneIndex) // #nosec: G115 - We validate if num pool zones exceeds max_int32.
 			secretMap := map[string]interface{}{
 				"userData": string(userData),

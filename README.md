@@ -1,58 +1,104 @@
-**This Gardener Extension Provider is a work in progress. Code may still break at any time. Use at your own risk.**
-
-----
-
 # [Gardener Extension for Hetzner Cloud provider](https://gardener.cloud)
 
-Project Gardener implements the automated management and operation of [Kubernetes](https://kubernetes.io/) clusters as a service.
+Project [Gardener](https://gardener.cloud) implements the automated management and operation of [Kubernetes](https://kubernetes.io/) clusters as a service.
 Its main principle is to leverage Kubernetes concepts for all of its tasks.
 
-Recently, most of the vendor specific logic has been developed [in-tree](https://github.com/gardener/gardener).
-However, the project has grown to a size where it is very hard to extend, maintain, and test.
-With [GEP-1](https://github.com/gardener/gardener/blob/master/docs/proposals/01-extensibility.md) we have proposed how the architecture can be changed in a way to support external controllers that contain their very own vendor specifics.
-This way, we can keep Gardener core clean and independent.
+With [GEP-1](https://github.com/gardener/gardener/blob/master/docs/proposals/01-extensibility.md), Gardener adopted an architecture in which vendor-specific logic lives in external controllers that implement Gardener's extension contract. This keeps Gardener core clean and provider-independent.
 
-This controller implements Gardener's extension contract for the Hetzner cloud provider.
+This controller implements Gardener's extension contract for the **Hetzner Cloud** provider. It is maintained by [OpenDefenseCloud](https://github.com/opendefensecloud) as a fork of the 23technologies extension, kept in sync with current Gardener releases.
 
-The latest release's `ControllerRegistration` resource that can be used to register this controller to Gardener can be found [here](https://github.com/opendefensecloud/gardener-extension-provider-hcloud/releases/latest/download/controller-registration.yaml).
+The latest release ships a [`ControllerRegistration` resource](https://github.com/opendefensecloud/gardener-extension-provider-hcloud/releases/latest/download/controller-registration.yaml) used to register this controller with Gardener.
 
-Please find more information regarding the extensibility concepts and a detailed proposal [here](https://github.com/gardener/gardener/blob/master/docs/proposals/01-extensibility.md).
+For more on the extensibility concepts and a detailed proposal, see [GEP-1](https://github.com/gardener/gardener/blob/master/docs/proposals/01-extensibility.md).
 
-## Supported Kubernetes versions
+> **Status:** This extension is under active development. Interfaces and behaviour may change between releases. Use at your own risk.
 
-This extension controller supports the following Kubernetes versions:
+## Compatibility
 
-| Version         | Support  |
-| --------------- | -------- |
-| Kubernetes 1.29 | 1.29.0+  |
-| Kubernetes 1.28 | 1.28.0+  |
-| Kubernetes 1.27 | 1.27.0+  |
-| Kubernetes 1.26 | 1.26.0+  |
-| Kubernetes 1.25 | 1.25.0+  |
+| Component | Version |
+| --- | --- |
+| Gardener | v1.147.1 |
+| Go | 1.26 |
+| Hetzner Cloud CCM | v1.34.0 |
+| Hetzner Cloud CSI driver | v2.22.0 |
+| machine-controller-manager | v0.62.1 |
+| machine-controller-manager-provider-hcloud | v0.4.1 |
 
-Please take a look [here](https://github.com/gardener/gardener/blob/master/docs/usage/supported_k8s_versions.md) to see which versions are supported by Gardener in general.
+The full set of shipped component images is defined in [charts/images.yaml](charts/images.yaml).
 
-----
+### Supported Kubernetes versions
 
-## How to start using or developing this extension controller locally
+The extension supports the Kubernetes versions supported by the pinned Gardener release (v1.147, `SupportedVersions` 1.32–1.36). The effective lower bound is **Kubernetes 1.33**, because the Hetzner Cloud CCM and CSI driver dropped support for 1.32.
 
-You can run the controller locally on your machine by executing `make start`.
+| Version | Support |
+| --- | --- |
+| Kubernetes 1.36 | ✅ |
+| Kubernetes 1.35 | ✅ |
+| Kubernetes 1.34 | ✅ |
+| Kubernetes 1.33 | ✅ (lower bound) |
 
-Static code checks and tests can be executed by running `VERIFY=true make all`. We are using Go modules for Golang package dependency management and [Ginkgo](https://github.com/onsi/ginkgo)/[Gomega](https://github.com/onsi/gomega) for testing.
+See the [Gardener supported Kubernetes versions](https://github.com/gardener/gardener/blob/master/docs/usage/shoot-operations/supported_k8s_versions.md) for the versions Gardener supports in general.
 
-## Feedback and Support
+## Controllers and features
 
-Feedback and contributions are always welcome. Please report bugs or suggestions as [GitHub issues](https://github.com/opendefensecloud/gardener-extension-provider-hcloud/issues) or join our [Slack channel #gardener](https://kubernetes.slack.com/messages/gardener) (please invite yourself to the Kubernetes workspace [here](http://slack.k8s.io)).
+This extension implements the following controllers:
 
-## Learn more!
+- `controlplane`
+- `infrastructure`
+- `worker`
+- `healthcheck`
 
-Please find further resources about out project here:
+### Infrastructure
 
-* [Our landing page gardener.cloud](https://gardener.cloud/)
-* ["Gardener, the Kubernetes Botanist" blog on kubernetes.io](https://kubernetes.io/blog/2018/05/17/gardener/)
-* ["Gardener Project Update" blog on kubernetes.io](https://kubernetes.io/blog/2019/12/02/gardener-project-update/)
-* [GEP-1 (Gardener Enhancement Proposal) on extensibility](https://github.com/gardener/gardener/blob/master/docs/proposals/01-extensibility.md)
-* [GEP-4 (New `core.gardener.cloud/v1beta1` API)](https://github.com/gardener/gardener/blob/master/docs/proposals/04-new-core-gardener-cloud-apis.md)
-* [Extensibility API documentation](https://github.com/gardener/gardener/tree/master/docs/extensions)
-* [Gardener Extensions Golang library](https://godoc.org/github.com/gardener/gardener/extensions/pkg)
-* [Gardener API Reference](https://gardener.cloud/api-reference/)
+- Creation of private networks in Hetzner Cloud
+- Registration of the Gardener SSH public key for use on the nodes
+
+### Not (yet) supported
+
+- Root volume customization (restricted to Hetzner Cloud image sizes and types)
+- Additional data volumes
+- Mapping of Gardener machine profiles to Hetzner Cloud image names
+
+Contributions in these areas are highly appreciated.
+
+## Documentation
+
+- [docs/README.md](docs/README.md) — controller and feature overview
+- [docs/deployment.md](docs/deployment.md) — deployment specifics for the `gardener-extension-admission-hcloud` component
+
+## Developing locally
+
+You can run the controller against a local or remote Gardener installation:
+
+```sh
+make start            # run the provider extension controller
+make start-admission  # run the admission webhook controller
+```
+
+Common development targets:
+
+```sh
+make generate   # regenerate code, CRDs and API reference docs
+make tidy       # tidy Go module dependencies (use this, not `go mod tidy` directly)
+make test       # run unit tests
+make verify     # check + format + test
+make docker-images  # build the container images
+```
+
+Dependency management uses Go modules. Tests are written with [Ginkgo](https://github.com/onsi/ginkgo)/[Gomega](https://github.com/onsi/gomega).
+
+## Feedback and support
+
+Feedback and contributions are always welcome. Please report bugs or suggestions as [GitHub issues](https://github.com/opendefensecloud/gardener-extension-provider-hcloud/issues).
+
+For general Gardener topics you can also join the [Kubernetes Slack](http://slack.k8s.io) `#gardener` channel.
+
+## Learn more
+
+- [Gardener landing page](https://gardener.cloud/)
+- ["Gardener, the Kubernetes Botanist" blog](https://kubernetes.io/blog/2018/05/17/gardener/)
+- [GEP-1 — extensibility](https://github.com/gardener/gardener/blob/master/docs/proposals/01-extensibility.md)
+- [GEP-4 — new `core.gardener.cloud/v1beta1` API](https://github.com/gardener/gardener/blob/master/docs/proposals/04-new-core-gardener-cloud-apis.md)
+- [Gardener extensibility documentation](https://github.com/gardener/gardener/tree/master/docs/extensions)
+- [Gardener Extensions Go library](https://pkg.go.dev/github.com/gardener/gardener/extensions/pkg)
+- [Gardener API reference](https://gardener.cloud/api-reference/)
