@@ -163,7 +163,14 @@ EOF
 helm repo add gardener-charts https://gardener-community.github.io/gardener-charts
 helm repo update
 
-helm template ext-provider-hcloud gardener-charts/provider-hcloud --set controller.enabled=true > example/provider-extensions/garden/controllerregistrations/provider-hcloud.yaml
+# provider-hcloud comes from THIS repo, not from the community chart. The
+# community chart publishes the 23technologies build of the extension, so
+# templating it here meant the e2e run exercised upstream's extension image and
+# never this fork. `make generate` produces example/controller-registration.yaml
+# (ControllerDeployment + ControllerRegistration, image tag from ./VERSION).
+make -C .. generate
+cp ../example/controller-registration.yaml example/provider-extensions/garden/controllerregistrations/provider-hcloud.yaml
+
 helm template ext-provider-azure gardener-charts/provider-azure --set controller.enabled=true | sed 's|1.43.1|1.42.3|g' > example/provider-extensions/garden/controllerregistrations/provider-azure.yaml # todo(jl) remove
 helm template ext-provider-openstack gardener-charts/provider-openstack --set controller.enabled=true > example/provider-extensions/garden/controllerregistrations/provider-openstack.yaml
 helm template networking-calico gardener-charts/networking-calico --set controller.enabled=true > example/provider-extensions/garden/controllerregistrations/networking-calico.yaml
@@ -184,23 +191,12 @@ metadata:
     provider.extensions.gardener.cloud/hcloud: "true"
   name: hcloud
 spec:
+  # Only the version under test — keeps this in lockstep with TEST_SHOOT_VERSION
+  # instead of drifting into a hand-maintained list (the previous list pinned
+  # 1.26.x, EOL since 2024, against a Gardener supporting 1.32-1.36).
   kubernetes:
     versions:
-    - classification: deprecated
-      version: 1.26.10
     - classification: supported
-      version: 1.26.11
-    - classification: deprecated
-      version: 1.26.5
-    - classification: deprecated
-      version: 1.26.6
-    - classification: deprecated
-      version: 1.26.7
-    - classification: deprecated
-      version: 1.26.8
-    - classification: deprecated
-      version: 1.26.9
-    - classification: preview
       version: $TEST_SHOOT_VERSION
   machineImages:
   - name: ubuntu
@@ -212,38 +208,40 @@ spec:
       - containerRuntimes:
         - type: gvisor
         name: containerd
-      version: 20.4.20210616
-    - architectures:
-      - amd64
-      cri:
-      - containerRuntimes:
-        - type: gvisor
-        name: containerd
-      version: 22.4.20231020
+      version: 24.4.20260501
+  # Current-generation Hetzner shared-vCPU plans. The previous entries
+  # (cx31/cpx31/cx41/cpx41) are a retired generation and also carried wrong
+  # specs — cx31 was listed as 2 vCPU when it was 2 vCPU/8GB, cpx31 as 4/8.
   machineTypes:
   - architecture: amd64
     cpu: "2"
     gpu: "0"
-    memory: 8Gi
-    name: cx31
+    memory: 4Gi
+    name: cx23
     usable: true
   - architecture: amd64
     cpu: "4"
     gpu: "0"
     memory: 8Gi
-    name: cpx31
-    usable: true
-  - architecture: amd64
-    cpu: "4"
-    gpu: "0"
-    memory: 16Gi
-    name: cx41
+    name: cx33
     usable: true
   - architecture: amd64
     cpu: "8"
     gpu: "0"
     memory: 16Gi
-    name: cpx41
+    name: cx43
+    usable: true
+  - architecture: amd64
+    cpu: "4"
+    gpu: "0"
+    memory: 8Gi
+    name: cpx32
+    usable: true
+  - architecture: amd64
+    cpu: "8"
+    gpu: "0"
+    memory: 16Gi
+    name: cpx42
     usable: true
   providerConfig:
     apiVersion: hcloud.provider.extensions.gardener.cloud/v1alpha1
@@ -252,12 +250,11 @@ spec:
     machineImages:
     - name: ubuntu
       versions:
-      - imageName: ubuntu-20.04
-        version: 20.4.20210616
-    - name: ubuntu
-      versions:
-      - imageName: ubuntu-22.04
-        version: 22.4.20231020
+      - imageName: ubuntu-24.04
+        version: 24.4.20260501
+    # Hetzner also offers hil (Hillsboro) and sin (Singapore); not listed here
+    # because their datacenter/zone names could not be verified without an API
+    # token, and the e2e flow only exercises fsn1.
     regions:
     - name: hel1
     - name: fsn1
@@ -276,21 +273,47 @@ spec:
   - name: ash
     zones:
     - name: ash-dc1
+      # The CX line is EU-only; CPX/CCX are available in ash.
       unavailableMachineTypes:
-      - cx21
-      - cx31
-      - cx41
-      - cx51
-      - ccx11
-      - ccx21
-      - ccx31
-      - ccx41
-      - ccx51
+      - cx23
+      - cx33
+      - cx43
   type: hcloud
   seedSelector:
     providerTypes:
     - openstack
 EOF
 
-make kind-extensions-up
-make gardener-extensions-up
+# ---------------------------------------------------------------------------
+# BLOCKED: the bring-up step below no longer exists upstream.
+#
+# This script drove `make kind-extensions-up && make gardener-extensions-up`.
+# Gardener deleted both targets, their backing scripts (hack/kind-extensions-up.sh,
+# hack/gardener-extensions-up.sh) and the whole example/provider-extensions/ tree
+# in PR #13994 ("Replace provider-extensions with remote setup", 2026-03-04).
+# Everything above still writes into example/provider-extensions/... which does
+# not exist at the pinned Gardener version either.
+#
+# The replacement is a gardener-operator based `remote` setup, and upstream is
+# explicit that there is no direct migration path:
+#   docs/deployment/getting_started_remotely.md
+#   make remote-up | operator-up | garden-up | seed-up   (aggregate: gardener-up)
+#   config moves to  dev-setup/{garden,gardenlet,gardenconfig}/overlays/remote/
+#   kubeconfigs move to dev-setup/kubeconfigs/{runtime,virtual-garden,remote}/
+# Porting also means publishing the extension as an OCI Helm chart plus an
+# Extension.operator.gardener.cloud manifest, rather than a ControllerRegistration.
+#
+# Failing loudly here beats a bare "No rule to make target" 200 lines from home.
+# ---------------------------------------------------------------------------
+cat >&2 <<'MSG'
+ERROR: the Gardener bring-up step of this e2e lane is not ported yet.
+
+  `make kind-extensions-up` / `make gardener-extensions-up` were removed from
+  gardener in PR #13994 and replaced by the `remote` setup (make remote-up /
+  gardener-up). See docs/deployment/getting_started_remotely.md in the pinned
+  gardener checkout, and the header comment in .github/workflows/e2e.yaml.
+
+  Everything up to this point (seed shoot, secrets, cloudprofile, extension
+  registration) has already been prepared and is left in place for inspection.
+MSG
+exit 1

@@ -7,9 +7,14 @@ export SHOOT_HASH=${SHOOT_HASH:-$(openssl rand -hex 2)}
 export SHOOT_NAME=ci-seed-$SHOOT_HASH
 
 export TEST_SHOOT_NAME=test-$SHOOT_HASH
-export TEST_SHOOT_VERSION=1.27.8
+# Must sit inside the pinned Gardener release's SupportedVersions (1.32-1.36 for
+# v1.148.0) and at or above the extension's documented floor of 1.33 (README.md).
+export TEST_SHOOT_VERSION=${TEST_SHOOT_VERSION:-1.36.3}
 
-export GARDENER_VERSION=${GARDENER_VERSION:=LATEST}
+# Default to the Gardener we actually build against rather than whatever the
+# newest upstream tag happens to be — floating to LATEST silently tests a
+# different Gardener than go.mod pins.
+export GARDENER_VERSION=${GARDENER_VERSION:-$(go list -m -f '{{.Version}}' github.com/gardener/gardener)}
 
 cat << EOF > hack/ci/handy.sh
 export AZURE_DNS_CLIENT_ID=$AZURE_DNS_CLIENT_ID
@@ -21,7 +26,9 @@ export HCLOUD_TOKEN=$HCLOUD_TOKEN
 export SHOOT_NAME=$SHOOT_NAME
 export TEST_SHOOT_NAME=$TEST_SHOOT_NAME
 export TEST_SHOOT_VERSION=$TEST_SHOOT_VERSION
-export PATH=$(pwd)/hack/tools/bin/:$PATH
+# Two dirs: install.sh writes kind/kubectl/yq/helm flat into bin/, while
+# gardener's tools.mk writes its tools into bin/<kernel>-<arch>/.
+export PATH=$(pwd)/hack/tools/bin/:$(pwd)/hack/tools/bin/$TOOLS_KERNEL-$TOOLS_ARCH/:\$PATH
 EOF
 
 if [[ ! -d gardener ]]; then
@@ -36,8 +43,13 @@ fi
 
 git checkout "$GARDENER_VERSION"
 
-# Waiting only for 5 minutes may be too short. Wait for 10 minutes instead
-sed -i 's/elapsed_time -gt 300/elapsed_time -gt 600/' example/provider-extensions/registry-seed/deploy-registry.sh
-sed -i 's|image: alpine:|image: registry.regio.digital/proxy_cache/alpine:|' example/provider-extensions/ssh-reverse-tunnel/base/ssh/ssh_deployment.yaml
-sed -i 's|image: alpine:|image: registry.regio.digital/proxy_cache/alpine:|' example/provider-extensions/ssh-reverse-tunnel/base/sshd/sshd_deployment.yaml
-sed -i 's|repository: hetznercloud:|repository: registry.regio.digital/proxy_cache/hetznercloud:|' ../charts/images.yaml
+# NOTE: four `sed -i` patches used to be applied here against
+# example/provider-extensions/{registry-seed,ssh-reverse-tunnel}/... — that whole
+# tree was deleted upstream in gardener PR #13994 (2026-03-04), so with `set -e`
+# they now abort this script outright. Removed rather than repointed, because the
+# replacement `remote` setup (dev-setup/) is a different design, not a moved path.
+#
+# A fifth sed rewrote charts/images.yaml to a registry.regio.digital proxy cache;
+# it was already inert (it matched `repository: hetznercloud:`, but the file
+# actually reads `repository: docker.io/hetznercloud/...`) and that registry
+# belongs to the 23technologies landscape, so it is gone too.
