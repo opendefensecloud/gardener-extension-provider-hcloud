@@ -40,11 +40,11 @@ _setVersion() {
 }
 
 install_kind() {
-  # not under renovate control
-  VERSION=v0.20.0
+  # renovate: datasource=github-releases depName=kubernetes-sigs/kind
+  VERSION=v0.32.0
 
   if _isStale "$KIND" "$VERSION"; then
-		curl -L -o "$KIND" "https://github.com/kubernetes-sigs/kind/releases/download/${VERSION}/kind-${TOOLS_KERNEL}-${TOOLS_ARCH}"
+		curl -fL -o "$KIND" "https://github.com/kubernetes-sigs/kind/releases/download/${VERSION}/kind-${TOOLS_KERNEL}-${TOOLS_ARCH}"
 		chmod +x "$KIND"
 
     _setVersion "$KIND" "$VERSION"
@@ -59,10 +59,10 @@ kind() {
 
 install_kubectl() {
   # renovate: datasource=github-tags depName=kubernetes/kubectl
-  VERSION=v0.28.4
+  VERSION=v0.36.3
 
   if _isStale $KUBECTL $VERSION; then
-    curl -Lo $KUBECTL "https://dl.k8s.io/release/${VERSION/v0/v1}/bin/$TOOLS_KERNEL/$TOOLS_ARCH/kubectl"
+    curl -fLo $KUBECTL "https://dl.k8s.io/release/${VERSION/v0/v1}/bin/$TOOLS_KERNEL/$TOOLS_ARCH/kubectl"
     chmod +x $KUBECTL
 
     _setVersion $KUBECTL $VERSION
@@ -76,10 +76,10 @@ kubectl () {
 
 install_yq() {
   # renovate: datasource=github-releases depName=mikefarah/yq
-  VERSION=v4.40.3
+  VERSION=v4.53.3
 
   if _isStale $YQ $VERSION; then
-    curl -L -o $YQ "https://github.com/mikefarah/yq/releases/download/$VERSION/yq_${TOOLS_KERNEL}_$TOOLS_ARCH"
+    curl -fL -o $YQ "https://github.com/mikefarah/yq/releases/download/$VERSION/yq_${TOOLS_KERNEL}_$TOOLS_ARCH"
     chmod +x $YQ
 
     _setVersion $YQ $VERSION
@@ -93,10 +93,10 @@ yq () {
 
 install_helm() {
   # renovate: datasource=github-tags depName=helm/helm
-  VERSION=v3.13.2
+  VERSION=v3.21.3
 
   if _isStale $HELM $VERSION; then
-    curl -L "https://get.helm.sh/helm-$VERSION-$TOOLS_KERNEL-$TOOLS_ARCH.tar.gz" | tar -xzm --strip-components 1 -C $TOOLS_BIN_DIR "$TOOLS_KERNEL-$TOOLS_ARCH/helm"
+    curl -fL "https://get.helm.sh/helm-$VERSION-$TOOLS_KERNEL-$TOOLS_ARCH.tar.gz" | tar -xzm --strip-components 1 -C $TOOLS_BIN_DIR "$TOOLS_KERNEL-$TOOLS_ARCH/helm"
     chmod +x $HELM
 
     _setVersion $HELM $VERSION

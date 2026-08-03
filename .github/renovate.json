@@ -1,8 +1,7 @@
 {
     "configMigration": true,
     "assignees": [
-        "j2L4e",
-        "rhizoet"
+        "christianhuening"
     ],
     "baseBranchPatterns": [
         "main"
@@ -42,6 +41,25 @@
             "matchStrings": [
                 "tag: (?<currentValue>.+?) # renovate: datasource=(?<datasource>.+?) depName=(?<depName>.+?)( versioning=(?<versioning>.+?))?\\n"
             ]
+        },
+        {
+            "customType": "regex",
+            "managerFilePatterns": [
+                "/^hack/tools/install\\.sh$/"
+            ],
+            "matchStrings": [
+                "# renovate: datasource=(?<datasource>.+?) depName=(?<depName>.+?)( versioning=(?<versioning>.+?))?\\s+VERSION=(?<currentValue>\\S+)"
+            ]
+        },
+        {
+            "description": "Tool versions pinned as `go run <module>@<version>` inside workflow run: blocks are invisible to the gomod and github-actions managers.",
+            "customType": "regex",
+            "managerFilePatterns": [
+                "/^\\.github/workflows/.+\\.ya?ml$/"
+            ],
+            "matchStrings": [
+                "# renovate: datasource=(?<datasource>.+?) depName=(?<depName>.+?)( versioning=(?<versioning>.+?))?\\s+run: go run \\S+@(?<currentValue>v\\S+)"
+            ]
         }
     ],
     "packageRules": [
@@ -76,7 +94,8 @@
             "matchPackageNames": [
                 "github.com/gardener/gardener",
                 "github.com/gardener/gardener/pkg/apis",
-                "github.com/gardener/gardener/hack/tools"
+                "github.com/gardener/gardener/hack/tools",
+                "github.com/gardener/etcd-druid/api"
             ]
         },
         {
@@ -111,7 +130,7 @@
             "matchPackageNames": [
                 "sigs.k8s.io/controller-tools"
             ],
-            "allowedVersions": "<0.21.0"
+            "allowedVersions": "<0.22.0"
         },
         {
             "matchManagers": [
@@ -120,7 +139,25 @@
             "matchPackageNames": [
                 "k8s.io/autoscaler/vertical-pod-autoscaler"
             ],
-            "allowedVersions": "<1.7.0"
+            "allowedVersions": "<1.8.0"
+        },
+        {
+            "description": "go-openapi cut v1.0.0 from the v0 line. Because Go treats v0 and v1 as the same module path, this major-semantics jump shows up as a routine update. gardener deliberately stays on the v0 line, so do not get ahead of it.",
+            "matchManagers": [
+                "gomod"
+            ],
+            "matchPackageNames": [
+                "github.com/go-openapi/jsonpointer",
+                "github.com/go-openapi/jsonreference"
+            ],
+            "allowedVersions": "<1.0.0"
+        },
+        {
+            "description": "Caps only hack/tools/install.sh's helm, which is used solely by hack/ci/*.sh (helm repo add/update/template) — that flow is unvalidated on Helm 4 and every chart here is still Chart apiVersion v1. Gardener's tools.mk pins its own separate helm binary at v4.2.3, so aligning is a deliberate migration, not a routine bump.",
+            "matchPackageNames": [
+                "helm/helm"
+            ],
+            "allowedVersions": "<4.0.0"
         },
         {
             "matchFileNames": [
