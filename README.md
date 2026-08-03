@@ -17,10 +17,10 @@ For more on the extensibility concepts and a detailed proposal, see [GEP-1](http
 
 | Component | Version |
 | --- | --- |
-| Gardener | v1.147.1 |
+| Gardener | v1.148.0 |
 | Go | 1.26 |
 | Hetzner Cloud CCM | v1.34.0 |
-| Hetzner Cloud CSI driver | v2.22.0 |
+| Hetzner Cloud CSI driver | v2.22.1 |
 | machine-controller-manager | v0.62.1 |
 | machine-controller-manager-provider-hcloud | v0.4.1 |
 
@@ -28,7 +28,9 @@ The full set of shipped component images is defined in [charts/images.yaml](char
 
 ### Supported Kubernetes versions
 
-The extension supports the Kubernetes versions supported by the pinned Gardener release (v1.147, `SupportedVersions` 1.32–1.36). The effective lower bound is **Kubernetes 1.33**, because the Hetzner Cloud CCM and CSI driver dropped support for 1.32.
+The extension supports the Kubernetes versions supported by the pinned Gardener release (v1.148, `SupportedVersions` 1.32–1.36). The effective lower bound is **Kubernetes 1.33**, because the Hetzner Cloud CCM and CSI driver dropped support for 1.32.
+
+> **Caveat on 1.33:** `csi-provisioner` v6.3.0 declares a minimum of Kubernetes 1.34 (for the `storage/v1` `VolumeAttributesClass` API). On a 1.33 shoot it does not fail — it detects the missing API and disables the `VolumeAttributesClass` feature gate — so provisioning works normally, but volume modification is unavailable and the combination is not supported upstream. Rolling back is not practical: every `csi-provisioner` v6.x declares the same minimum.
 
 | Version | Support |
 | --- | --- |
