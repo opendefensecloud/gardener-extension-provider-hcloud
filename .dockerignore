@@ -1,6 +1,13 @@
 # Ignore everything
 **
 
+# get-build-ld-flags.sh stamps version.gitCommit from `git rev-parse HEAD` and
+# computes the tree state with `git ls-files --exclude-from=.dockerignore`, so
+# both of these must be present in the build context or the shipped binaries
+# report an empty commit. Matches gardener/gardener's own .dockerignore.
+!.git
+!.dockerignore
+
 # Exclude folders relevant for build
 !charts/
 !cmd/
@@ -8,9 +15,14 @@
 !example/
 !hack/
 !pkg/
-!test/
-!tools/
-!vendor/
+
+# hack/ is allowlisted wholesale above. Re-exclude the parts that must never
+# reach the daemon: local CI credentials, and host-native tool binaries that
+# are both useless in the image and ~150 MB of build context.
+hack/ci/secrets
+hack/ci/secrets/**
+hack/tools/bin
+hack/tools/bin/**
 
 !.gitignore
 !.golangci.yaml
