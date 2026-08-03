@@ -19,31 +19,49 @@ package apis
 
 import (
 	"os"
+	"sync"
 
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
-var singletons = make(map[string]*hcloud.Client)
+// singletonsMutex guards singletons: reconcilers read it concurrently while
+// SetClientForToken may write, and Go maps are not safe for concurrent read/write.
+var (
+	singletonsMutex sync.RWMutex
+	singletons      = make(map[string]*hcloud.Client)
+)
 
 // GetClientForToken returns an underlying HCloud client for the given token.
+//
+// A client preregistered via SetClientForToken is returned as-is; otherwise a
+// fresh one is built per call. Deliberately NOT cached: hcloud.Client keeps the
+// plaintext token in a field, so caching would pin every token the process ever
+// saw — including rotated and revoked ones — in the heap for its whole lifetime,
+// with no eviction path. There is nothing to gain in exchange: hcloud.NewClient
+// leaves http.Client.Transport nil, so every client already shares
+// http.DefaultTransport's connection pool, and the rate-limit handler is
+// stateless (it only reads response headers).
 //
 // PARAMETERS
 // token string Token to look up client instance for
 func GetClientForToken(token string) *hcloud.Client {
+	singletonsMutex.RLock()
 	client, ok := singletons[token]
+	singletonsMutex.RUnlock()
 
-	if !ok {
-		opts := []hcloud.ClientOption{
-			hcloud.WithToken(token),
-			hcloud.WithApplication("gardener-extension-provider-hcloud", "v0.0.0"),
-		}
-		if endpoint := os.Getenv("HCLOUD_ENDPOINT"); endpoint != "" {
-			opts = append(opts, hcloud.WithEndpoint(endpoint))
-		}
-		client = hcloud.NewClient(opts...)
+	if ok {
+		return client
 	}
 
-	return client
+	opts := []hcloud.ClientOption{
+		hcloud.WithToken(token),
+		hcloud.WithApplication("gardener-extension-provider-hcloud", "v0.0.0"),
+	}
+	if endpoint := os.Getenv("HCLOUD_ENDPOINT"); endpoint != "" {
+		opts = append(opts, hcloud.WithEndpoint(endpoint))
+	}
+
+	return hcloud.NewClient(opts...)
 }
 
 // SetClientForToken sets a preconfigured HCloud client for the given token.
@@ -52,6 +70,9 @@ func GetClientForToken(token string) *hcloud.Client {
 // token  string         Token to look up client instance for
 // client *hcloud.Client Preconfigured HCloud client
 func SetClientForToken(token string, client *hcloud.Client) {
+	singletonsMutex.Lock()
+	defer singletonsMutex.Unlock()
+
 	if client == nil {
 		delete(singletons, token)
 	} else {

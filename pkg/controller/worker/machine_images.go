@@ -58,7 +58,9 @@ func (w *workerDelegate) findMachineImageName(ctx context.Context, name, version
 		Status: []hcloudclient.ImageStatus{"available"},
 	}
 
-	images, _, err := client.Image.List(ctx, opts)
+	// AllWithOpts() follows pagination; List() would return only the first page and
+	// silently hide images beyond it, surfacing as ErrorMachineImageNotFound.
+	images, err := client.Image.AllWithOpts(ctx, opts)
 	if nil != err {
 		return "", err
 	}
