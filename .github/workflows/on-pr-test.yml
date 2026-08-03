@@ -2,7 +2,8 @@ name: go:test
 
 on:
   pull_request:
-    paths-ignore: 'docs/**'
+    paths-ignore:
+      - 'docs/**'
 
 permissions:
   contents: read
@@ -14,20 +15,21 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        go-version: [ "1.26" ]
+    timeout-minutes: 30
 
     steps:
     - name: Checkout commit
-      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-    - name: Set up Go ${{ matrix.go-version }}
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+    - name: Set up Go
       uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
       with:
-        go-version: ${{ matrix.go-version }}
+        go-version-file: go.mod
     - name: Populate module cache
       run: go mod download
     - name: Lint
+      # renovate: datasource=go depName=github.com/golangci/golangci-lint/v2
       run: go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.12.2 run ./cmd/... ./pkg/...
     - name: Verify generated files are up to date
       run: |
@@ -36,7 +38,8 @@ jobs:
         git config --global user.name "opendefensecloud CI"
         make check-generate
     - name: Vulnerability scan
-      run: go run golang.org/x/vuln/cmd/govulncheck@latest ./...
+      # renovate: datasource=go depName=golang.org/x/vuln
+      run: go run golang.org/x/vuln/cmd/govulncheck@v1.6.0 ./...
     - name: Execute build
       run: make install
     - name: Execute tests
