@@ -33,7 +33,9 @@ import (
 // PARAMETERS
 // _ context.Context Execution context
 func (w *workerDelegate) PreReconcileHook(ctx context.Context) error {
-	serverTypes, _, err := w.hclient.ServerType.List(ctx, hcloud.ServerTypeListOpts{})
+	// All() follows pagination; List() would return only the first page and silently
+	// hide every server type beyond it, making valid machine types look non-existent.
+	serverTypes, err := w.hclient.ServerType.All(ctx)
 	if err != nil {
 		return fmt.Errorf("unable to list server types: %w", err)
 	}
