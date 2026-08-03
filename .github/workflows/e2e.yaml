@@ -1,16 +1,44 @@
 name: End-to-End test
+
+# DISABLED ON A SCHEDULE — this lane cannot currently run. Do not re-enable the
+# cron until the prerequisites below are met; until then it only queues nightly
+# and is killed by the 24h queue timeout (15 consecutive cancelled runs as of
+# 2026-08-03, zero successful runs ever).
+#
+# Two independent blockers:
+#
+#  1. Infrastructure. It needs a `arc-runner-set` self-hosted runner (none are
+#     registered) and the secrets GARDENER_KUBECONFIG, AZURE_DNS_CLIENT_ID,
+#     AZURE_DNS_CLIENT_SECRET, AZURE_DNS_SUBSCRIPTION_ID, AZURE_DNS_TENANT_ID
+#     and HCLOUD_TOKEN (only RENOVATE_TOKEN is configured). The scripts also
+#     assume a 23technologies-operated Gardener landscape (project
+#     garden-23ke-ci, cloudprofile `regiocloud`) that this fork does not own.
+#
+#  2. Upstream. hack/ci/*.sh drives gardener's example/provider-extensions/
+#     scaffolding and the make targets kind-extensions-up / gardener-extensions-up
+#     / -down / kind-extensions-clean. Gardener removed all of them in PR #13994
+#     ("Replace provider-extensions with remote setup", 2026-03-04), replacing
+#     them with a gardener-operator based `remote` setup (make remote-up /
+#     gardener-up, dev-setup/). Upstream states there is no direct migration
+#     path, so these scripts need a rewrite, not a patch.
+#
+# Kept as workflow_dispatch so the work-in-progress stays runnable by hand.
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 0 * * *'
+
+permissions:
+  contents: read
 
 jobs:
   e2e:
     runs-on: arc-runner-set
     name: "End-to-End test"
+    timeout-minutes: 180
     steps:
       - name: Checkout source
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: install Dependencies
         run: sudo apt-get update && sudo apt-get install -y apache2 git curl make jq openssh-client
       - name: Setup Go
@@ -18,8 +46,11 @@ jobs:
         with:
           go-version-file: go.mod
       - name: Setup Gardener kubeconfig
+        env:
+          GARDENER_KUBECONFIG: ${{ secrets.GARDENER_KUBECONFIG }}
         run: |
-          echo "${{ secrets.GARDENER_KUBECONFIG }}" > hack/ci/secrets/gardener-kubeconfig.yaml
+          mkdir -p hack/ci/secrets
+          printf '%s' "$GARDENER_KUBECONFIG" > hack/ci/secrets/gardener-kubeconfig.yaml
       - name: Setup environment
         env:
           AZURE_DNS_CLIENT_ID: ${{ secrets.AZURE_DNS_CLIENT_ID }}
