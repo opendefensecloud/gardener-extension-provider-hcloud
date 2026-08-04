@@ -21,24 +21,68 @@ import (
 	"github.com/gardener/gardener/pkg/apis/core"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/gstruct"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/utils/ptr"
 )
 
 var _ = Describe("Shoot validation", func() {
 	Describe("#ValidateShootNetworking", func() {
+		var fldPath = field.NewPath("spec", "networking")
+
 		It("should accept a fully specified networking section", func() {
-			networking := core.Networking{
+			networking := &core.Networking{
 				Type:     ptr.To("calico"),
 				Nodes:    ptr.To("10.250.0.0/16"),
 				Pods:     ptr.To("100.96.0.0/11"),
 				Services: ptr.To("100.64.0.0/13"),
 			}
 
-			Expect(ValidateShootNetworking(networking)).To(BeEmpty())
+			Expect(ValidateShootNetworking(networking, fldPath)).To(BeEmpty())
 		})
 
-		It("should accept an empty networking section", func() {
-			Expect(ValidateShootNetworking(core.Networking{})).To(BeEmpty())
+		It("should require a nodes CIDR", func() {
+			errList := ValidateShootNetworking(&core.Networking{Type: ptr.To("calico")}, fldPath)
+
+			Expect(errList).To(ConsistOf(
+				gstruct.PointTo(gstruct.MatchFields(gstruct.IgnoreExtras, gstruct.Fields{
+					"Type":  Equal(field.ErrorTypeRequired),
+					"Field": Equal("spec.networking.nodes"),
+				})),
+			))
+		})
+
+		It("should reject an empty nodes CIDR", func() {
+			errList := ValidateShootNetworking(&core.Networking{Nodes: ptr.To("")}, fldPath)
+
+			Expect(errList).To(ConsistOf(
+				gstruct.PointTo(gstruct.MatchFields(gstruct.IgnoreExtras, gstruct.Fields{
+					"Type":  Equal(field.ErrorTypeRequired),
+					"Field": Equal("spec.networking.nodes"),
+				})),
+			))
+		})
+
+		It("should reject a missing networking section", func() {
+			errList := ValidateShootNetworking(nil, fldPath)
+
+			Expect(errList).To(ConsistOf(
+				gstruct.PointTo(gstruct.MatchFields(gstruct.IgnoreExtras, gstruct.Fields{
+					"Type":  Equal(field.ErrorTypeRequired),
+					"Field": Equal("spec.networking.nodes"),
+				})),
+			))
+		})
+
+		It("should reject a nodes CIDR that cannot be parsed", func() {
+			errList := ValidateShootNetworking(&core.Networking{Nodes: ptr.To("10.250.0.0/33")}, fldPath)
+
+			Expect(errList).To(ConsistOf(
+				gstruct.PointTo(gstruct.MatchFields(gstruct.IgnoreExtras, gstruct.Fields{
+					"Type":  Equal(field.ErrorTypeInvalid),
+					"Field": Equal("spec.networking.nodes"),
+				})),
+			))
 		})
 	})
 })

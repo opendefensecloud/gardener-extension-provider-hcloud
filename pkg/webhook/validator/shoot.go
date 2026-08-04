@@ -71,19 +71,20 @@ func (s *shoot) Validate(ctx context.Context, new, old client.Object) error {
 
 func (s *shoot) validateShoot(_ context.Context, shoot *core.Shoot) error {
 	// Network validation
-	if errList := validation.ValidateShootNetworking(*shoot.Spec.Networking); len(errList) != 0 {
+	if errList := validation.ValidateShootNetworking(shoot.Spec.Networking, field.NewPath("spec", "networking")); len(errList) != 0 {
 		return errList.ToAggregate()
 	}
 
 	// Provider validation
 	fldPath := field.NewPath("spec", "provider")
+	infraConfigFldPath := fldPath.Child("infrastructureConfig")
 
 	infraConfig, err := transcoder.DecodeInfrastructureConfig(shoot.Spec.Provider.InfrastructureConfig)
 	if err != nil {
-		return field.InternalError(fldPath.Child("infrastructureConfig"), err)
+		return field.InternalError(infraConfigFldPath, err)
 	}
 
-	if errList := validation.ValidateInfrastructureConfig(infraConfig, shoot.Spec.Networking.Nodes, shoot.Spec.Networking.Pods, shoot.Spec.Networking.Services); len(errList) != 0 {
+	if errList := validation.ValidateInfrastructureConfig(infraConfig, shoot.Spec.Networking.Nodes, shoot.Spec.Networking.Pods, shoot.Spec.Networking.Services, infraConfigFldPath); len(errList) != 0 {
 		return errList.ToAggregate()
 	}
 

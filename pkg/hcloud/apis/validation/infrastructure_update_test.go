@@ -18,8 +18,6 @@ limitations under the License.
 package validation
 
 import (
-	"github.com/gardener/gardener/pkg/apis/core"
-	gardencorev1beta1 "github.com/gardener/gardener/pkg/apis/core/v1beta1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gstruct"
@@ -69,18 +67,6 @@ var _ = Describe("InfrastructureConfig update validation", func() {
 			changed := oldConfig.DeepCopy()
 			changed.FloatingPoolName = "pool-changed"
 			Expect(ValidateInfrastructureConfigUpdate(oldConfig, changed)).To(BeEmpty())
-		})
-	})
-
-	Describe("#ValidateInfrastructureConfigAgainstCloudProfile", func() {
-		It("should not return errors for the given inputs", func() {
-			shoot := &core.Shoot{}
-			cloudProfile := &gardencorev1beta1.CloudProfile{}
-			fldPath := field.NewPath("providerConfig")
-
-			errList := ValidateInfrastructureConfigAgainstCloudProfile(oldConfig, newConfig, shoot, cloudProfile, fldPath)
-
-			Expect(errList).To(BeEmpty())
 		})
 	})
 })
