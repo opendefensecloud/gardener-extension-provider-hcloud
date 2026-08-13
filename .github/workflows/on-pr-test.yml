@@ -39,7 +39,7 @@ jobs:
         make check-generate
     - name: Vulnerability scan
       # renovate: datasource=go depName=golang.org/x/vuln
-      run: go run golang.org/x/vuln/cmd/govulncheck@v1.6.0 ./...
+      run: go run golang.org/x/vuln/cmd/govulncheck@v1.7.0 ./...
     - name: Execute build
       run: make install
     - name: Execute tests
