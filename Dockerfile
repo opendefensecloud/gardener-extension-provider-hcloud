@@ -7,8 +7,12 @@ FROM --platform=$BUILDPLATFORM golang:1.26.6@sha256:640a234f4bea3e399c056b7b8f9c
 
 ARG TARGETOS
 ARG TARGETARCH
+# `local` pins the build to the toolchain baked into the base image above. Without
+# it, a `toolchain` directive in go.mod newer than that image silently downloads a
+# second toolchain mid-build; failing loudly is better than an unpinned compiler.
 ENV BINARY_PATH=/go/bin \
     CGO_ENABLED=0 \
+    GOTOOLCHAIN=local \
     GOOS=$TARGETOS \
     GOARCH=$TARGETARCH
 WORKDIR /go/src/github.com/opendefensecloud/gardener-extension-provider-hcloud
