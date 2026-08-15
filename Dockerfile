@@ -3,12 +3,16 @@
 ############# builder
 # Run the builder on the native build platform and cross-compile to the target
 # arch (GOOS/GOARCH below). This avoids QEMU emulation of the whole Go toolchain.
-FROM --platform=$BUILDPLATFORM golang:1.26.5@sha256:3aff6657219a4d9c14e27fb1d8976c49c29fddb70ba835014f477e1c70636647 AS builder
+FROM --platform=$BUILDPLATFORM golang:1.26.6@sha256:640a234f4bea3e399c056b7b8f9c667c4939befae8db2f14e9785e16eccd4205 AS builder
 
 ARG TARGETOS
 ARG TARGETARCH
+# `local` pins the build to the toolchain baked into the base image above. Without
+# it, a `toolchain` directive in go.mod newer than that image silently downloads a
+# second toolchain mid-build; failing loudly is better than an unpinned compiler.
 ENV BINARY_PATH=/go/bin \
     CGO_ENABLED=0 \
+    GOTOOLCHAIN=local \
     GOOS=$TARGETOS \
     GOARCH=$TARGETARCH
 WORKDIR /go/src/github.com/opendefensecloud/gardener-extension-provider-hcloud
