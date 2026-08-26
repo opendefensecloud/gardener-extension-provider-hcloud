@@ -41,7 +41,7 @@ _setVersion() {
 
 install_kind() {
   # renovate: datasource=github-releases depName=kubernetes-sigs/kind
-  VERSION=v0.32.0
+  VERSION=v0.33.0
 
   if _isStale "$KIND" "$VERSION"; then
 		curl -fL -o "$KIND" "https://github.com/kubernetes-sigs/kind/releases/download/${VERSION}/kind-${TOOLS_KERNEL}-${TOOLS_ARCH}"
