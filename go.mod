@@ -2,7 +2,7 @@ module github.com/opendefensecloud/gardener-extension-provider-hcloud
 
 go 1.26.4
 
-toolchain go1.26.6
+toolchain go1.27.1
 
 require (
 	github.com/Masterminds/semver/v3 v3.5.0
