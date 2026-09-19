@@ -1,5 +1,9 @@
 {
     "configMigration": true,
+    "extends": [
+        "security:gomodIndirectSecurityUpdates"
+    ],
+    "osvVulnerabilityAlerts": true,
     "assignees": [
         "christianhuening"
     ],
@@ -59,6 +63,16 @@
             ],
             "matchStrings": [
                 "# renovate: datasource=(?<datasource>.+?) depName=(?<depName>.+?)( versioning=(?<versioning>.+?))?\\s+run: go run \\S+@(?<currentValue>v\\S+)"
+            ]
+        },
+        {
+            "description": "GOTOOLCHAIN pinned in the Makefile (gardener's convention), invisible to the gomod manager.",
+            "customType": "regex",
+            "managerFilePatterns": [
+                "/^Makefile$/"
+            ],
+            "matchStrings": [
+                "# renovate: datasource=(?<datasource>.+?) depName=(?<depName>.+?)( versioning=(?<versioning>.+?))?\\s+export GOTOOLCHAIN := go(?<currentValue>\\S+)"
             ]
         }
     ],
@@ -166,6 +180,18 @@
             "addLabels": [
                 "image"
             ]
+        },
+        {
+            "description": "Follow gardener's Go line: gardener v1.151 builds on go 1.26.x. Caps the go/toolchain directives, the Makefile GOTOOLCHAIN and the golang builder image below 1.27 until gardener moves; patch releases still flow.",
+            "matchDatasources": [
+                "golang-version",
+                "docker"
+            ],
+            "matchPackageNames": [
+                "go",
+                "golang"
+            ],
+            "allowedVersions": "<1.27"
         }
     ]
 }
