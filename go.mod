@@ -9,9 +9,9 @@ require (
 	github.com/ahmetb/gen-crd-api-reference-docs v0.3.0
 	github.com/coreos/go-systemd/v22 v22.7.0
 	github.com/gardener/etcd-druid/api v0.38.2
-	github.com/gardener/gardener v1.151.0
-	github.com/gardener/gardener/hack/tools v1.151.0
-	github.com/gardener/gardener/pkg/apis v1.151.0
+	github.com/gardener/gardener v1.151.1
+	github.com/gardener/gardener/hack/tools v1.151.1
+	github.com/gardener/gardener/pkg/apis v1.151.1
 	github.com/gardener/machine-controller-manager v0.62.1
 	github.com/go-logr/logr v1.4.4
 	github.com/hetznercloud/hcloud-go/v2 v2.48.0
