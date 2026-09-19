@@ -31,6 +31,7 @@
     ],
     "prCreation": "immediate",
     "recreateWhen": "always",
+    "rebaseWhen": "behind-base-branch",
     "semanticCommits": "disabled",
     "addLabels": [
         "version-bump"
