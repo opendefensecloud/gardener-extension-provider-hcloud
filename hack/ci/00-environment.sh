@@ -8,7 +8,7 @@ export SHOOT_NAME=ci-seed-$SHOOT_HASH
 
 export TEST_SHOOT_NAME=test-$SHOOT_HASH
 # Must sit inside the pinned Gardener release's SupportedVersions (1.32-1.36 for
-# v1.148.0) and at or above the extension's documented floor of 1.33 (README.md).
+# v1.151.0) and at or above the extension's documented floor of 1.33 (README.md).
 export TEST_SHOOT_VERSION=${TEST_SHOOT_VERSION:-1.36.3}
 
 # Default to the Gardener we actually build against rather than whatever the

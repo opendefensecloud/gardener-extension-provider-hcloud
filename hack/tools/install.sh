@@ -41,7 +41,7 @@ _setVersion() {
 
 install_kind() {
   # renovate: datasource=github-releases depName=kubernetes-sigs/kind
-  VERSION=v0.32.0
+  VERSION=v0.33.0
 
   if _isStale "$KIND" "$VERSION"; then
 		curl -fL -o "$KIND" "https://github.com/kubernetes-sigs/kind/releases/download/${VERSION}/kind-${TOOLS_KERNEL}-${TOOLS_ARCH}"
@@ -59,7 +59,7 @@ kind() {
 
 install_kubectl() {
   # renovate: datasource=github-tags depName=kubernetes/kubectl
-  VERSION=v0.36.3
+  VERSION=v0.37.0
 
   if _isStale $KUBECTL $VERSION; then
     curl -fLo $KUBECTL "https://dl.k8s.io/release/${VERSION/v0/v1}/bin/$TOOLS_KERNEL/$TOOLS_ARCH/kubectl"
@@ -76,7 +76,7 @@ kubectl () {
 
 install_yq() {
   # renovate: datasource=github-releases depName=mikefarah/yq
-  VERSION=v4.53.3
+  VERSION=v4.53.6
 
   if _isStale $YQ $VERSION; then
     curl -fL -o $YQ "https://github.com/mikefarah/yq/releases/download/$VERSION/yq_${TOOLS_KERNEL}_$TOOLS_ARCH"
@@ -93,7 +93,7 @@ yq () {
 
 install_helm() {
   # renovate: datasource=github-tags depName=helm/helm
-  VERSION=v3.21.3
+  VERSION=v3.22.0
 
   if _isStale $HELM $VERSION; then
     curl -fL "https://get.helm.sh/helm-$VERSION-$TOOLS_KERNEL-$TOOLS_ARCH.tar.gz" | tar -xzm --strip-components 1 -C $TOOLS_BIN_DIR "$TOOLS_KERNEL-$TOOLS_ARCH/helm"
