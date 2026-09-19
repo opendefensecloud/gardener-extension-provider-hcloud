@@ -28,3 +28,6 @@ jobs:
           token: ${{ secrets.RENOVATE_TOKEN }}
         env:
           RENOVATE_REPOSITORIES: ${{ github.repository }}
+          # Passphrase-less ed25519 key registered as a signing key on the
+          # RENOVATE_TOKEN account; main's ruleset requires signed commits.
+          RENOVATE_GIT_PRIVATE_KEY: ${{ secrets.RENOVATE_GIT_PRIVATE_KEY }}

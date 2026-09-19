@@ -4,6 +4,10 @@
         "security:gomodIndirectSecurityUpdates"
     ],
     "osvVulnerabilityAlerts": true,
+    "gitAuthor": "Renovate Bot <738953+christianhuening@users.noreply.github.com>",
+    "gitIgnoredAuthors": [
+        "renovate@whitesourcesoftware.com"
+    ],
     "assignees": [
         "christianhuening"
     ],
