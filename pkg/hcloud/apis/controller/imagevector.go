@@ -27,13 +27,16 @@ import (
 var imageVector imagevector.ImageVector
 
 func init() {
-	newImageVector, err := imagevector.Read([]byte(charts.ImagesYAML))
+	var (
+		err      error
+		caBundle *imagevector.CABundle
+	)
+
+	imageVector, caBundle, err = imagevector.Read([]byte(charts.ImagesYAML))
 	runtime.Must(err)
 
-	newImageVector, err = imagevector.WithEnvOverride(newImageVector, imagevector.OverrideEnv)
+	imageVector, _, err = imagevector.WithEnvOverride(imageVector, caBundle, imagevector.OverrideEnv)
 	runtime.Must(err)
-
-	imageVector = newImageVector
 }
 
 // ImageVector is the image vector that contains all the needed images.
