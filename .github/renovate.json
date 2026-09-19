@@ -4,6 +4,9 @@
         "security:gomodIndirectSecurityUpdates"
     ],
     "osvVulnerabilityAlerts": true,
+    "vulnerabilityAlerts": {
+        "groupName": "vulnerable dependencies"
+    },
     "gitAuthor": "Renovate Bot <738953+christianhuening@users.noreply.github.com>",
     "gitIgnoredAuthors": [
         "renovate@whitesourcesoftware.com"
