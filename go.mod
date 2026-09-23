@@ -24,7 +24,7 @@ require (
 	k8s.io/api v0.36.4
 	k8s.io/apiextensions-apiserver v0.36.4
 	k8s.io/apimachinery v0.36.4
-	k8s.io/autoscaler/vertical-pod-autoscaler v1.7.1
+	k8s.io/autoscaler/vertical-pod-autoscaler v1.7.2
 	k8s.io/client-go v0.36.4
 	k8s.io/code-generator v0.36.4
 	k8s.io/component-base v0.36.4
@@ -81,7 +81,7 @@ require (
 	github.com/felixge/httpsnoop v1.1.0 // indirect
 	github.com/fluent/fluent-operator/v3 v3.7.0 // indirect
 	github.com/fsnotify/fsnotify v1.10.1 // indirect
-	github.com/fxamacker/cbor/v2 v2.9.2 // indirect
+	github.com/fxamacker/cbor/v2 v2.9.3 // indirect
 	github.com/gardener/cert-management v0.23.0 // indirect
 	github.com/gardener/pvc-autoscaler v0.3.0 // indirect
 	github.com/go-jose/go-jose/v4 v4.1.4 // indirect
