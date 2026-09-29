@@ -76,7 +76,7 @@ kubectl () {
 
 install_yq() {
   # renovate: datasource=github-releases depName=mikefarah/yq
-  VERSION=v4.53.6
+  VERSION=v4.54.1
 
   if _isStale $YQ $VERSION; then
     curl -fL -o $YQ "https://github.com/mikefarah/yq/releases/download/$VERSION/yq_${TOOLS_KERNEL}_$TOOLS_ARCH"
