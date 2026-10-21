@@ -293,6 +293,15 @@ var _ = Describe("Machines", func() {
 				} else {
 					Expect(err).NotTo(HaveOccurred())
 					Expect(result).Should(HaveLen(data.expect.numberOfMachineDeployments))
+
+					// The generic worker actuator rejects MachineDeployments whose PoolName is not a worker pool.
+					poolNames := make([]string, 0, len(data.action.worker.Spec.Pools))
+					for _, pool := range data.action.worker.Spec.Pools {
+						poolNames = append(poolNames, pool.Name)
+					}
+					for _, machineDeployment := range result {
+						Expect(machineDeployment.PoolName).To(BeElementOf(poolNames))
+					}
 				}
 			},
 

@@ -293,6 +293,7 @@ func (w *workerDelegate) generateMachineConfig(ctx context.Context) error {
 				Name:                 deploymentName,
 				ClassName:            className,
 				SecretName:           className,
+				PoolName:             pool.Name,
 				Minimum:              pool.Minimum,
 				Maximum:              pool.Maximum,
 				Priority:             pool.Priority,
