@@ -17,27 +17,27 @@ For more on the extensibility concepts and a detailed proposal, see [GEP-1](http
 
 | Component | Version |
 | --- | --- |
-| Gardener | v1.151.0 |
-| Go | 1.26 |
-| Hetzner Cloud CCM | v1.37.0 |
-| Hetzner Cloud CSI driver | v2.23.0 |
-| machine-controller-manager | v0.62.1 |
-| machine-controller-manager-provider-hcloud | v0.4.1 |
+| Gardener | v1.153.1 |
+| Go | 1.26 (≥ 1.26.10) |
+| Hetzner Cloud CCM | v1.39.1 |
+| Hetzner Cloud CSI driver | v2.24.0 |
+| machine-controller-manager | v0.63.0 |
+| machine-controller-manager-provider-hcloud | v0.6.0 |
 
 The full set of shipped component images is defined in [charts/images.yaml](charts/images.yaml).
 
+Go 1.26.10 is a hard floor (`go` directive in [go.mod](go.mod)): it adds the `crypto/x509` denylist for the compromised eMudhra intermediates (CVE-2026-111943). The runtime image is `distroless/static-debian13`, whose CA bundle no longer contains the emSign ECC Root CA - G3 and AAA Certificate Services roots behind them.
+
 ### Supported Kubernetes versions
 
-The extension supports the Kubernetes versions supported by the pinned Gardener release (v1.151, `SupportedVersions` 1.32–1.36). The effective lower bound is **Kubernetes 1.33**, because the Hetzner Cloud CCM and CSI driver dropped support for 1.32.
-
-> **Caveat on 1.33:** `csi-provisioner` v6.3.0 declares a minimum of Kubernetes 1.34 (for the `storage/v1` `VolumeAttributesClass` API). On a 1.33 shoot it does not fail — it detects the missing API and disables the `VolumeAttributesClass` feature gate — so provisioning works normally, but volume modification is unavailable and the combination is not supported upstream. Rolling back is not practical: every `csi-provisioner` v6.x declares the same minimum.
+The extension supports the Kubernetes versions supported by the pinned Gardener release (v1.153, `SupportedVersions` 1.32–1.37). The effective lower bound is **Kubernetes 1.34**, because the Hetzner Cloud CCM (v1.38+) and CSI driver (v2.24+) dropped support for 1.33.
 
 | Version | Support |
 | --- | --- |
+| Kubernetes 1.37 | ✅ |
 | Kubernetes 1.36 | ✅ |
 | Kubernetes 1.35 | ✅ |
-| Kubernetes 1.34 | ✅ |
-| Kubernetes 1.33 | ✅ (lower bound) |
+| Kubernetes 1.34 | ✅ (lower bound) |
 
 See the [Gardener supported Kubernetes versions](https://github.com/gardener/gardener/blob/master/docs/usage/shoot-operations/supported_k8s_versions.md) for the versions Gardener supports in general.
 
