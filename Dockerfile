@@ -3,7 +3,7 @@
 ############# builder
 # Run the builder on the native build platform and cross-compile to the target
 # arch (GOOS/GOARCH below). This avoids QEMU emulation of the whole Go toolchain.
-FROM --platform=$BUILDPLATFORM golang:1.26.8@sha256:ef46d02b02ed68aa94b6a49ba5d3ec62003b8d5ce4b7497fe83e056f2e8fd378 AS builder
+FROM --platform=$BUILDPLATFORM golang:1.26.10@sha256:672c944cfd07599b5f1bb179869270cdc94c6254e41db4d431259693cb286b82 AS builder
 
 ARG TARGETOS
 ARG TARGETARCH
@@ -35,7 +35,10 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     if [ -d "/go/bin/${GOOS}_${GOARCH}" ]; then mv "/go/bin/${GOOS}_${GOARCH}/"* /go/bin/; fi
 
 ############# base
-FROM gcr.io/distroless/static-debian12:nonroot@sha256:afa5c872c891853ca7fcf1f12c3edb23f7eeef36189728842dd51042ff57f7ab AS base
+# debian13: its ca-certificates (20250419+deb13u1) drops the emSign ECC Root CA - G3 and
+# AAA Certificate Services roots behind the compromised eMudhra intermediates
+# (CVE-2026-111943); static-debian12 still ships both.
+FROM gcr.io/distroless/static-debian13:nonroot@sha256:d62067879de890a1def9da0e7766b7d20810a5e5555cef8506b752437d7a3e88 AS base
 LABEL org.opencontainers.image.source="https://github.com/opendefensecloud/gardener-extension-provider-hcloud"
 
 WORKDIR /
