@@ -12,7 +12,6 @@ package v1alpha1
 import (
 	unsafe "unsafe"
 
-	hcloud "github.com/hetznercloud/hcloud-go/v2/hcloud"
 	apis "github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis"
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	runtime "k8s.io/apimachinery/pkg/runtime"
@@ -199,10 +198,7 @@ func RegisterConversions(s *runtime.Scheme) error {
 }
 
 func autoConvert_v1alpha1_CPLoadBalancerClass_To_apis_CPLoadBalancerClass(in *CPLoadBalancerClass, out *apis.CPLoadBalancerClass, s conversion.Scope) error {
-	out.Name = in.Name
-	out.IPPoolName = (*string)(unsafe.Pointer(in.IPPoolName))
-	out.TCPAppProfileName = (*string)(unsafe.Pointer(in.TCPAppProfileName))
-	out.UDPAppProfileName = (*string)(unsafe.Pointer(in.UDPAppProfileName))
+	*out = *(*apis.CPLoadBalancerClass)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -212,10 +208,7 @@ func Convert_v1alpha1_CPLoadBalancerClass_To_apis_CPLoadBalancerClass(in *CPLoad
 }
 
 func autoConvert_apis_CPLoadBalancerClass_To_v1alpha1_CPLoadBalancerClass(in *apis.CPLoadBalancerClass, out *CPLoadBalancerClass, s conversion.Scope) error {
-	out.Name = in.Name
-	out.IPPoolName = (*string)(unsafe.Pointer(in.IPPoolName))
-	out.TCPAppProfileName = (*string)(unsafe.Pointer(in.TCPAppProfileName))
-	out.UDPAppProfileName = (*string)(unsafe.Pointer(in.UDPAppProfileName))
+	*out = *(*CPLoadBalancerClass)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -225,7 +218,7 @@ func Convert_apis_CPLoadBalancerClass_To_v1alpha1_CPLoadBalancerClass(in *apis.C
 }
 
 func autoConvert_v1alpha1_CloudControllerManagerConfig_To_apis_CloudControllerManagerConfig(in *CloudControllerManagerConfig, out *apis.CloudControllerManagerConfig, s conversion.Scope) error {
-	out.FeatureGates = *(*map[string]bool)(unsafe.Pointer(&in.FeatureGates))
+	*out = *(*apis.CloudControllerManagerConfig)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -235,7 +228,7 @@ func Convert_v1alpha1_CloudControllerManagerConfig_To_apis_CloudControllerManage
 }
 
 func autoConvert_apis_CloudControllerManagerConfig_To_v1alpha1_CloudControllerManagerConfig(in *apis.CloudControllerManagerConfig, out *CloudControllerManagerConfig, s conversion.Scope) error {
-	out.FeatureGates = *(*map[string]bool)(unsafe.Pointer(&in.FeatureGates))
+	*out = *(*CloudControllerManagerConfig)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -299,8 +292,7 @@ func Convert_apis_ControlPlaneConfig_To_v1alpha1_ControlPlaneConfig(in *apis.Con
 }
 
 func autoConvert_v1alpha1_DockerDaemonOptions_To_apis_DockerDaemonOptions(in *DockerDaemonOptions, out *apis.DockerDaemonOptions, s conversion.Scope) error {
-	out.HTTPProxyConf = (*string)(unsafe.Pointer(in.HTTPProxyConf))
-	out.InsecureRegistries = *(*[]string)(unsafe.Pointer(&in.InsecureRegistries))
+	*out = *(*apis.DockerDaemonOptions)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -310,8 +302,7 @@ func Convert_v1alpha1_DockerDaemonOptions_To_apis_DockerDaemonOptions(in *Docker
 }
 
 func autoConvert_apis_DockerDaemonOptions_To_v1alpha1_DockerDaemonOptions(in *apis.DockerDaemonOptions, out *DockerDaemonOptions, s conversion.Scope) error {
-	out.HTTPProxyConf = (*string)(unsafe.Pointer(in.HTTPProxyConf))
-	out.InsecureRegistries = *(*[]string)(unsafe.Pointer(&in.InsecureRegistries))
+	*out = *(*DockerDaemonOptions)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -343,8 +334,7 @@ func Convert_apis_InfrastructureConfig_To_v1alpha1_InfrastructureConfig(in *apis
 }
 
 func autoConvert_v1alpha1_InfrastructureConfigNetwork_To_apis_InfrastructureConfigNetwork(in *InfrastructureConfigNetwork, out *apis.InfrastructureConfigNetwork, s conversion.Scope) error {
-	out.Cidr = in.Cidr
-	out.Zone = hcloud.NetworkZone(in.Zone)
+	*out = *(*apis.InfrastructureConfigNetwork)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -354,8 +344,7 @@ func Convert_v1alpha1_InfrastructureConfigNetwork_To_apis_InfrastructureConfigNe
 }
 
 func autoConvert_apis_InfrastructureConfigNetwork_To_v1alpha1_InfrastructureConfigNetwork(in *apis.InfrastructureConfigNetwork, out *InfrastructureConfigNetwork, s conversion.Scope) error {
-	out.Cidr = in.Cidr
-	out.Zone = hcloud.NetworkZone(in.Zone)
+	*out = *(*InfrastructureConfigNetwork)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -365,7 +354,7 @@ func Convert_apis_InfrastructureConfigNetwork_To_v1alpha1_InfrastructureConfigNe
 }
 
 func autoConvert_v1alpha1_InfrastructureConfigNetworkIDs_To_apis_InfrastructureConfigNetworkIDs(in *InfrastructureConfigNetworkIDs, out *apis.InfrastructureConfigNetworkIDs, s conversion.Scope) error {
-	out.Workers = in.Workers
+	*out = *(*apis.InfrastructureConfigNetworkIDs)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -375,7 +364,7 @@ func Convert_v1alpha1_InfrastructureConfigNetworkIDs_To_apis_InfrastructureConfi
 }
 
 func autoConvert_apis_InfrastructureConfigNetworkIDs_To_v1alpha1_InfrastructureConfigNetworkIDs(in *apis.InfrastructureConfigNetworkIDs, out *InfrastructureConfigNetworkIDs, s conversion.Scope) error {
-	out.Workers = in.Workers
+	*out = *(*InfrastructureConfigNetworkIDs)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -385,8 +374,7 @@ func Convert_apis_InfrastructureConfigNetworkIDs_To_v1alpha1_InfrastructureConfi
 }
 
 func autoConvert_v1alpha1_InfrastructureConfigNetworks_To_apis_InfrastructureConfigNetworks(in *InfrastructureConfigNetworks, out *apis.InfrastructureConfigNetworks, s conversion.Scope) error {
-	out.WorkersConfiguration = (*apis.InfrastructureConfigNetwork)(unsafe.Pointer(in.WorkersConfiguration))
-	out.Workers = in.Workers
+	*out = *(*apis.InfrastructureConfigNetworks)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -396,8 +384,7 @@ func Convert_v1alpha1_InfrastructureConfigNetworks_To_apis_InfrastructureConfigN
 }
 
 func autoConvert_apis_InfrastructureConfigNetworks_To_v1alpha1_InfrastructureConfigNetworks(in *apis.InfrastructureConfigNetworks, out *InfrastructureConfigNetworks, s conversion.Scope) error {
-	out.WorkersConfiguration = (*InfrastructureConfigNetwork)(unsafe.Pointer(in.WorkersConfiguration))
-	out.Workers = in.Workers
+	*out = *(*InfrastructureConfigNetworks)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -435,8 +422,7 @@ func Convert_apis_InfrastructureStatus_To_v1alpha1_InfrastructureStatus(in *apis
 }
 
 func autoConvert_v1alpha1_MachineImage_To_apis_MachineImage(in *MachineImage, out *apis.MachineImage, s conversion.Scope) error {
-	out.Name = in.Name
-	out.Version = in.Version
+	*out = *(*apis.MachineImage)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -446,8 +432,7 @@ func Convert_v1alpha1_MachineImage_To_apis_MachineImage(in *MachineImage, out *a
 }
 
 func autoConvert_apis_MachineImage_To_v1alpha1_MachineImage(in *apis.MachineImage, out *MachineImage, s conversion.Scope) error {
-	out.Name = in.Name
-	out.Version = in.Version
+	*out = *(*MachineImage)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -457,8 +442,7 @@ func Convert_apis_MachineImage_To_v1alpha1_MachineImage(in *apis.MachineImage, o
 }
 
 func autoConvert_v1alpha1_MachineImageVersion_To_apis_MachineImageVersion(in *MachineImageVersion, out *apis.MachineImageVersion, s conversion.Scope) error {
-	out.Version = in.Version
-	out.ImageName = in.ImageName
+	*out = *(*apis.MachineImageVersion)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -468,8 +452,7 @@ func Convert_v1alpha1_MachineImageVersion_To_apis_MachineImageVersion(in *Machin
 }
 
 func autoConvert_apis_MachineImageVersion_To_v1alpha1_MachineImageVersion(in *apis.MachineImageVersion, out *MachineImageVersion, s conversion.Scope) error {
-	out.Version = in.Version
-	out.ImageName = in.ImageName
+	*out = *(*MachineImageVersion)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -479,8 +462,7 @@ func Convert_apis_MachineImageVersion_To_v1alpha1_MachineImageVersion(in *apis.M
 }
 
 func autoConvert_v1alpha1_MachineImages_To_apis_MachineImages(in *MachineImages, out *apis.MachineImages, s conversion.Scope) error {
-	out.Name = in.Name
-	out.Versions = *(*[]apis.MachineImageVersion)(unsafe.Pointer(&in.Versions))
+	*out = *(*apis.MachineImages)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -490,8 +472,7 @@ func Convert_v1alpha1_MachineImages_To_apis_MachineImages(in *MachineImages, out
 }
 
 func autoConvert_apis_MachineImages_To_v1alpha1_MachineImages(in *apis.MachineImages, out *MachineImages, s conversion.Scope) error {
-	out.Name = in.Name
-	out.Versions = *(*[]MachineImageVersion)(unsafe.Pointer(&in.Versions))
+	*out = *(*MachineImages)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -501,8 +482,7 @@ func Convert_apis_MachineImages_To_v1alpha1_MachineImages(in *apis.MachineImages
 }
 
 func autoConvert_v1alpha1_MachineTypeOptions_To_apis_MachineTypeOptions(in *MachineTypeOptions, out *apis.MachineTypeOptions, s conversion.Scope) error {
-	out.Name = in.Name
-	out.ExtraConfig = *(*map[string]string)(unsafe.Pointer(&in.ExtraConfig))
+	*out = *(*apis.MachineTypeOptions)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -512,8 +492,7 @@ func Convert_v1alpha1_MachineTypeOptions_To_apis_MachineTypeOptions(in *MachineT
 }
 
 func autoConvert_apis_MachineTypeOptions_To_v1alpha1_MachineTypeOptions(in *apis.MachineTypeOptions, out *MachineTypeOptions, s conversion.Scope) error {
-	out.Name = in.Name
-	out.ExtraConfig = *(*map[string]string)(unsafe.Pointer(&in.ExtraConfig))
+	*out = *(*MachineTypeOptions)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -523,8 +502,7 @@ func Convert_apis_MachineTypeOptions_To_v1alpha1_MachineTypeOptions(in *apis.Mac
 }
 
 func autoConvert_v1alpha1_RegionSpec_To_apis_RegionSpec(in *RegionSpec, out *apis.RegionSpec, s conversion.Scope) error {
-	out.Name = in.Name
-	out.MachineImages = *(*[]apis.MachineImages)(unsafe.Pointer(&in.MachineImages))
+	*out = *(*apis.RegionSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -534,8 +512,7 @@ func Convert_v1alpha1_RegionSpec_To_apis_RegionSpec(in *RegionSpec, out *apis.Re
 }
 
 func autoConvert_apis_RegionSpec_To_v1alpha1_RegionSpec(in *apis.RegionSpec, out *RegionSpec, s conversion.Scope) error {
-	out.Name = in.Name
-	out.MachineImages = *(*[]MachineImages)(unsafe.Pointer(&in.MachineImages))
+	*out = *(*RegionSpec)(unsafe.Pointer(in))
 	return nil
 }
 

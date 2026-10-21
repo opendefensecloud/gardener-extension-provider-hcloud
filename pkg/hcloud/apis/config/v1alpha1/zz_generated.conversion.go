@@ -14,7 +14,6 @@ import (
 
 	apisconfigv1alpha1 "github.com/gardener/gardener/extensions/pkg/apis/config/v1alpha1"
 	config "github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud/apis/config"
-	resource "k8s.io/apimachinery/pkg/api/resource"
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	componentbaseconfig "k8s.io/component-base/config"
@@ -92,7 +91,7 @@ func Convert_config_ControllerConfiguration_To_v1alpha1_ControllerConfiguration(
 }
 
 func autoConvert_v1alpha1_ETCD_To_config_ETCD(in *ETCD, out *config.ETCD, s conversion.Scope) error {
-	out.Storage = (*config.ETCDStorage)(unsafe.Pointer(in.Storage))
+	*out = *(*config.ETCD)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -102,7 +101,7 @@ func Convert_v1alpha1_ETCD_To_config_ETCD(in *ETCD, out *config.ETCD, s conversi
 }
 
 func autoConvert_config_ETCD_To_v1alpha1_ETCD(in *config.ETCD, out *ETCD, s conversion.Scope) error {
-	out.Storage = (*ETCDStorage)(unsafe.Pointer(in.Storage))
+	*out = *(*ETCD)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -112,8 +111,7 @@ func Convert_config_ETCD_To_v1alpha1_ETCD(in *config.ETCD, out *ETCD, s conversi
 }
 
 func autoConvert_v1alpha1_ETCDStorage_To_config_ETCDStorage(in *ETCDStorage, out *config.ETCDStorage, s conversion.Scope) error {
-	out.ClassName = in.ClassName
-	out.Capacity = (*resource.Quantity)(unsafe.Pointer(in.Capacity))
+	*out = *(*config.ETCDStorage)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -123,8 +121,7 @@ func Convert_v1alpha1_ETCDStorage_To_config_ETCDStorage(in *ETCDStorage, out *co
 }
 
 func autoConvert_config_ETCDStorage_To_v1alpha1_ETCDStorage(in *config.ETCDStorage, out *ETCDStorage, s conversion.Scope) error {
-	out.ClassName = in.ClassName
-	out.Capacity = (*resource.Quantity)(unsafe.Pointer(in.Capacity))
+	*out = *(*ETCDStorage)(unsafe.Pointer(in))
 	return nil
 }
 
