@@ -33,8 +33,11 @@ jobs:
         with:
           go-version-file: go.mod
       - name: Vulnerability scan
+        # pipefail (implied by an explicit `shell: bash`) so a govulncheck error is not masked by the filter;
+        # hack/govulncheck-filter.sh documents the allowlisted false positives.
+        shell: bash
         # renovate: datasource=go depName=golang.org/x/vuln
-        run: go run golang.org/x/vuln/cmd/govulncheck@v1.8.0 ./...
+        run: go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 -format json ./... | bash hack/govulncheck-filter.sh
 
   dependency-review:
     name: "Dependency review"

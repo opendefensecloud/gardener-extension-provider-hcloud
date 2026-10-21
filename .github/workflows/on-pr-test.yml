@@ -30,7 +30,7 @@ jobs:
       run: go mod download
     - name: Lint
       # renovate: datasource=go depName=github.com/golangci/golangci-lint/v2
-      run: go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.13.2 run ./cmd/... ./pkg/...
+      run: go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.15.0 run ./cmd/... ./pkg/...
     - name: Verify generated files are up to date
       run: |
         # check-generate.sh creates a temporary checkpoint commit, which needs a git identity
@@ -38,8 +38,11 @@ jobs:
         git config --global user.name "opendefensecloud CI"
         make check-generate
     - name: Vulnerability scan
+      # pipefail (implied by an explicit `shell: bash`) so a govulncheck error is not masked by the filter;
+      # hack/govulncheck-filter.sh documents the allowlisted false positives.
+      shell: bash
       # renovate: datasource=go depName=golang.org/x/vuln
-      run: go run golang.org/x/vuln/cmd/govulncheck@v1.8.0 ./...
+      run: go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 -format json ./... | bash hack/govulncheck-filter.sh
     - name: Execute build
       run: make install
     - name: Execute tests
