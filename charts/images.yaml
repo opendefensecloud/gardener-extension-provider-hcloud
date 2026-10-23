@@ -18,7 +18,7 @@ images:
 - name: hcloud-cloud-controller-manager
   sourceRepository: https://github.com/hetznercloud/hcloud-cloud-controller-manager
   repository: docker.io/hetznercloud/hcloud-cloud-controller-manager
-  tag: v1.39.1 # renovate: datasource=github-releases depName=hetznercloud/hcloud-cloud-controller-manager
+  tag: v1.39.2 # renovate: datasource=github-releases depName=hetznercloud/hcloud-cloud-controller-manager
 - name: machine-controller-manager-provider-hcloud
   sourceRepository: https://github.com/opendefensecloud/machine-controller-manager-provider-hcloud
   repository: ghcr.io/opendefensecloud/machine-controller-manager-provider-hcloud
@@ -26,11 +26,11 @@ images:
 - name: csi-driver-controller
   sourceRepository: https://github.com/hetznercloud/csi-driver
   repository: docker.io/hetznercloud/hcloud-csi-driver
-  tag: v2.24.0 # renovate: datasource=github-releases depName=hetznercloud/csi-driver
+  tag: v2.24.1 # renovate: datasource=github-releases depName=hetznercloud/csi-driver
 - name: csi-driver-node
   sourceRepository: https://github.com/hetznercloud/csi-driver
   repository: docker.io/hetznercloud/hcloud-csi-driver
-  tag: v2.24.0 # renovate: datasource=github-releases depName=hetznercloud/csi-driver
+  tag: v2.24.1 # renovate: datasource=github-releases depName=hetznercloud/csi-driver
 - name: liveness-probe
   sourceRepository: https://github.com/kubernetes-csi/livenessprobe
   repository: registry.k8s.io/sig-storage/livenessprobe
