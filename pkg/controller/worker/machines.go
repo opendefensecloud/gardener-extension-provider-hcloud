@@ -19,7 +19,9 @@ package worker
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"maps"
 	"path/filepath"
 
 	extensionscontroller "github.com/gardener/gardener/extensions/pkg/controller"
@@ -27,12 +29,15 @@ import (
 	genericworkeractuator "github.com/gardener/gardener/extensions/pkg/controller/worker/genericactuator"
 	gardencorev1beta1helper "github.com/gardener/gardener/pkg/api/core/v1beta1/helper"
 	corev1beta1 "github.com/gardener/gardener/pkg/apis/core/v1beta1"
+	v1beta1constants "github.com/gardener/gardener/pkg/apis/core/v1beta1/constants"
 	extensionsv1alpha1 "github.com/gardener/gardener/pkg/apis/extensions/v1alpha1"
 	"github.com/gardener/gardener/pkg/client/kubernetes"
 	machinev1alpha1 "github.com/gardener/machine-controller-manager/pkg/apis/machine/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	"github.com/opendefensecloud/gardener-extension-provider-hcloud/charts"
 	"github.com/opendefensecloud/gardener-extension-provider-hcloud/pkg/hcloud"
@@ -66,7 +71,11 @@ func (w *workerDelegate) DeployMachineClasses(ctx context.Context) error {
 		}
 	}
 
-	return w.seedChartApplier.ApplyFromEmbeddedFS(ctx, charts.InternalChart, filepath.Join(charts.InternalChartsPath, "machineclass"), w.worker.Namespace, "machineclass", kubernetes.Values(map[string]interface{}{"machineClasses": w.machineClasses}))
+	if err := w.seedChartApplier.ApplyFromEmbeddedFS(ctx, charts.InternalChart, filepath.Join(charts.InternalChartsPath, "machineclass"), w.worker.Namespace, "machineclass", kubernetes.Values(map[string]interface{}{"machineClasses": w.machineClasses})); err != nil {
+		return err
+	}
+
+	return w.backfillNodeTemplates(ctx)
 }
 
 // GenerateMachineDeployments generates the configuration for the desired machine deployments.
@@ -260,6 +269,8 @@ func (w *workerDelegate) generateMachineConfig(ctx context.Context) error {
 				}
 			}
 
+			machineClassSpec["nodeTemplate"] = nodeTemplate(pool, values.MachineType, w.worker.Spec.Region, zone)
+
 			deploymentName := fmt.Sprintf("%s-%s-%s", w.worker.Namespace, pool.Name, zone)
 			className := fmt.Sprintf("%s-%s", deploymentName, workerPoolHash)
 
@@ -317,7 +328,141 @@ func (w *workerDelegate) generateMachineConfig(ctx context.Context) error {
 }
 
 type machineValues struct {
+	MachineType        *corev1beta1.MachineType
 	MachineTypeOptions *apis.MachineTypeOptions
+}
+
+// nodeTemplate describes the machines of a pool to MCM: instance type, placement and capacity.
+// Since v0.63.0, machine-controller-manager labels its machine duration metrics with the instance
+// type from the MachineClass's node template and panics on a class without one: the machine never
+// leaves Pending although its node has joined, and deleting it fails the same way. MCM has always
+// rejected a template whose capacity lacks cpu, gpu or memory, when creating and deleting machines
+// alike, so the capacity gardenlet derived for the pool is laid over the CloudProfile's own values.
+func nodeTemplate(pool extensionsv1alpha1.WorkerPool, machineType *corev1beta1.MachineType, region, zone string) map[string]interface{} {
+	capacity := machineTypeCapacity(machineType)
+	template := map[string]interface{}{
+		"instanceType": pool.MachineType,
+		"region":       region,
+		"zone":         zone,
+		"architecture": ptr.Deref(pool.Architecture, v1beta1constants.ArchitectureAMD64),
+	}
+
+	if pool.NodeTemplate != nil {
+		maps.Copy(capacity, pool.NodeTemplate.Capacity)
+		if len(pool.NodeTemplate.VirtualCapacity) > 0 {
+			template["virtualCapacity"] = quantityStrings(pool.NodeTemplate.VirtualCapacity)
+		}
+	}
+	template["capacity"] = quantityStrings(capacity)
+
+	return template
+}
+
+// machineTypeCapacity yields the capacity MCM requires in a node template -- cpu, gpu and memory --
+// as the CloudProfile declares it for the machine type. Without a machine type all three are zero,
+// which still passes MCM's validation.
+func machineTypeCapacity(machineType *corev1beta1.MachineType) corev1.ResourceList {
+	capacity := corev1.ResourceList{
+		corev1.ResourceCPU:    resource.Quantity{},
+		"gpu":                 resource.Quantity{},
+		corev1.ResourceMemory: resource.Quantity{},
+	}
+
+	if machineType != nil {
+		capacity[corev1.ResourceCPU] = machineType.CPU
+		capacity["gpu"] = machineType.GPU
+		capacity[corev1.ResourceMemory] = machineType.Memory
+	}
+
+	return capacity
+}
+
+// quantityStrings renders a resource list for the machineclass chart.
+func quantityStrings(resources corev1.ResourceList) map[string]string {
+	rendered := make(map[string]string, len(resources))
+	for name, quantity := range resources {
+		rendered[string(name)] = quantity.String()
+	}
+
+	return rendered
+}
+
+// backfillNodeTemplates gives a node template to every MachineClass in the shoot namespace that
+// lacks one, built from the class's server type and zone, the CloudProfile machine type and the
+// Worker's region. MCM >= v0.63.0 panics on any machine of a class without one (see nodeTemplate),
+// after every restart again. DeployMachineClasses renders only the wanted classes, so the classes of
+// a previous pool hash keep what an older release wrote until their machines are gone -- unpatched,
+// their deletion would wedge the rolling update. PreReconcileHook calls this before the machine
+// classes are generated, so it skips none as wanted there; DeployMachineClasses renders those in full
+// afterwards.
+//
+// PARAMETERS
+// ctx context.Context Execution context
+func (w *workerDelegate) backfillNodeTemplates(ctx context.Context) error {
+	wanted := make(map[string]struct{}, len(w.machineClasses))
+	for _, machineClass := range w.machineClasses {
+		if name, ok := machineClass["name"].(string); ok {
+			wanted[name] = struct{}{}
+		}
+	}
+
+	machineClasses := &machinev1alpha1.MachineClassList{}
+	if err := w.client.List(ctx, machineClasses, client.InNamespace(w.worker.Namespace)); err != nil {
+		return fmt.Errorf("could not list machine classes: %w", err)
+	}
+
+	for i := range machineClasses.Items {
+		machineClass := &machineClasses.Items[i]
+		if _, ok := wanted[machineClass.Name]; ok || machineClass.NodeTemplate != nil || machineClass.ProviderSpec.Raw == nil {
+			continue
+		}
+
+		var providerSpec struct {
+			ServerType string `json:"serverType"`
+			Zone       string `json:"zone"`
+		}
+		// A class this cannot be derived for is left alone rather than failing: the error would never
+		// go away and would block every reconciliation and the deletion of the Worker.
+		if err := json.Unmarshal(machineClass.ProviderSpec.Raw, &providerSpec); err != nil {
+			log.FromContext(ctx).Info("Not adding a node template to machine class, its provider spec cannot be decoded", "machineClass", machineClass.Name, "error", err.Error())
+			continue
+		}
+		if providerSpec.ServerType == "" || providerSpec.Zone == "" {
+			log.FromContext(ctx).Info("Not adding a node template to machine class, its provider spec lacks the server type or zone", "machineClass", machineClass.Name)
+			continue
+		}
+
+		machineType := w.cloudProfileMachineType(providerSpec.ServerType)
+		architecture := v1beta1constants.ArchitectureAMD64
+		if machineType != nil && machineType.Architecture != nil {
+			architecture = *machineType.Architecture
+		}
+
+		patch := client.MergeFrom(machineClass.DeepCopy())
+		machineClass.NodeTemplate = &machinev1alpha1.NodeTemplate{
+			Capacity:     machineTypeCapacity(machineType),
+			InstanceType: providerSpec.ServerType,
+			Region:       w.worker.Spec.Region,
+			Zone:         providerSpec.Zone,
+			Architecture: ptr.To(architecture),
+		}
+		if err := w.client.Patch(ctx, machineClass, patch); client.IgnoreNotFound(err) != nil {
+			return fmt.Errorf("could not add a node template to machine class %s: %w", machineClass.Name, err)
+		}
+	}
+
+	return nil
+}
+
+// cloudProfileMachineType yields the CloudProfile's machine type of the given name, or nil.
+func (w *workerDelegate) cloudProfileMachineType(name string) *corev1beta1.MachineType {
+	for _, mt := range w.cluster.CloudProfile.Spec.MachineTypes {
+		if mt.Name == name {
+			return &mt
+		}
+	}
+
+	return nil
 }
 
 // extractMachineValues extracts the relevant machine values from the cloud profile spec.
@@ -325,19 +470,13 @@ type machineValues struct {
 // PARAMETERS
 // ctx context.Context Execution context
 func (w *workerDelegate) extractMachineValues(machineTypeName string) (*machineValues, error) {
-	var machineType *corev1beta1.MachineType
-	for _, mt := range w.cluster.CloudProfile.Spec.MachineTypes {
-		if mt.Name == machineTypeName {
-			machineType = &mt
-			break
-		}
-	}
+	machineType := w.cloudProfileMachineType(machineTypeName)
 	if machineType == nil {
 		err := fmt.Errorf("machine type %s not found in cloud profile spec", machineTypeName)
 		return nil, err
 	}
 
-	values := &machineValues{}
+	values := &machineValues{MachineType: machineType}
 
 	cloudProfileConfig, err := transcoder.DecodeConfigFromCloudProfile(w.cluster.CloudProfile)
 	if err != nil {
