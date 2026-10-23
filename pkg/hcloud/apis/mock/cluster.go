@@ -32,7 +32,10 @@ const (
 		"kind": "CloudProfile",
 		"spec": {
 			"regions": [{"name": "hel1", "zones": [{"name": "hel1-dc2"}]}],
-			"machineTypes": [{"name": "cx11"}],
+			"machineTypes": [
+				{"name": "cx11", "cpu": "1", "gpu": "0", "memory": "2Gi"},
+				{"name": "cax11", "cpu": "2", "gpu": "0", "memory": "4Gi", "architecture": "arm64"}
+			],
 			"providerConfig": {
 				"apiVersion": "hcloud.provider.extensions.gardener.cloud/v1alpha1",
 				"kind": "CloudProfileConfig",

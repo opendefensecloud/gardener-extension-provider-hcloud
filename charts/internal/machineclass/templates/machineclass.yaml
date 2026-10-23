@@ -17,6 +17,19 @@ kind: MachineClass
 metadata:
   name: {{ $machineClass.name }}
   namespace: {{ $.Release.Namespace }}
+{{- if $machineClass.nodeTemplate }}
+nodeTemplate:
+  capacity:
+{{ toYaml $machineClass.nodeTemplate.capacity | indent 4 }}
+{{- if $machineClass.nodeTemplate.virtualCapacity }}
+  virtualCapacity:
+{{ toYaml $machineClass.nodeTemplate.virtualCapacity | indent 4 }}
+{{- end }}
+  instanceType: {{ $machineClass.nodeTemplate.instanceType }}
+  region: {{ $machineClass.nodeTemplate.region }}
+  zone: {{ $machineClass.nodeTemplate.zone }}
+  architecture: {{ $machineClass.nodeTemplate.architecture }}
+{{- end }}
 credentialsSecretRef:
   name: {{ $machineClass.credentialsSecretRef.name }}
   namespace: {{ $machineClass.credentialsSecretRef.namespace }}

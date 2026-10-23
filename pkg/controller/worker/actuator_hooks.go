@@ -33,6 +33,14 @@ import (
 // PARAMETERS
 // _ context.Context Execution context
 func (w *workerDelegate) PreReconcileHook(ctx context.Context) error {
+	// gardenlet redeploys MCM before it reconciles the Worker, and the checks below can fail on the
+	// Hetzner API or a machine type out of stock -- before DeployMachineClasses is ever reached. Give the
+	// existing machine classes their node templates first, or MCM >= v0.63.0 panics on their machines
+	// for as long as that lasts.
+	if err := w.backfillNodeTemplates(ctx); err != nil {
+		return err
+	}
+
 	// All() follows pagination; List() would return only the first page and silently
 	// hide every server type beyond it, making valid machine types look non-existent.
 	serverTypes, err := w.hclient.ServerType.All(ctx)
