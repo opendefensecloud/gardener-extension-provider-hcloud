@@ -19,8 +19,8 @@ For more on the extensibility concepts and a detailed proposal, see [GEP-1](http
 | --- | --- |
 | Gardener | v1.153.1 |
 | Go | 1.26 (≥ 1.26.10) |
-| Hetzner Cloud CCM | v1.39.1 |
-| Hetzner Cloud CSI driver | v2.24.0 |
+| Hetzner Cloud CCM | v1.39.2 |
+| Hetzner Cloud CSI driver | v2.24.1 |
 | machine-controller-manager | v0.63.0 |
 | machine-controller-manager-provider-hcloud | v0.6.0 |
 
