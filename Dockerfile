@@ -3,7 +3,7 @@
 ############# builder
 # Run the builder on the native build platform and cross-compile to the target
 # arch (GOOS/GOARCH below). This avoids QEMU emulation of the whole Go toolchain.
-FROM --platform=$BUILDPLATFORM golang:1.26.10@sha256:672c944cfd07599b5f1bb179869270cdc94c6254e41db4d431259693cb286b82 AS builder
+FROM --platform=$BUILDPLATFORM golang:1.26.10@sha256:670bb5aa5349ae03b8516764718486f4f16399134bdc9acd0c46a23f043ab05c AS builder
 
 ARG TARGETOS
 ARG TARGETARCH
