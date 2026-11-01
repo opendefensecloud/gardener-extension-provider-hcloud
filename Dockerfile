@@ -38,7 +38,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 # debian13: its ca-certificates (20250419+deb13u1) drops the emSign ECC Root CA - G3 and
 # AAA Certificate Services roots behind the compromised eMudhra intermediates
 # (CVE-2026-111943); static-debian12 still ships both.
-FROM gcr.io/distroless/static-debian13:nonroot@sha256:d62067879de890a1def9da0e7766b7d20810a5e5555cef8506b752437d7a3e88 AS base
+FROM gcr.io/distroless/static-debian13:nonroot@sha256:25ac8f0c3b2334a9eb05452266bd4697864a8c8ef0ef71e5e6480d7f92868329 AS base
 LABEL org.opencontainers.image.source="https://github.com/opendefensecloud/gardener-extension-provider-hcloud"
 
 WORKDIR /
