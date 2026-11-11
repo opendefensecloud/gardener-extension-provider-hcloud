@@ -18,7 +18,9 @@
         "main"
     ],
     "automerge": false,
-    "dependencyDashboard": true,
+    "dependencyDashboard": {
+        "enabled": true
+    },
     "platformAutomerge": true,
     "prHourlyLimit": 0,
     "prConcurrentLimit": 0,
