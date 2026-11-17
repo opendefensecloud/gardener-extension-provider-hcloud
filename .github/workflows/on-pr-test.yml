@@ -42,7 +42,7 @@ jobs:
       # hack/govulncheck-filter.sh documents the allowlisted false positives.
       shell: bash
       # renovate: datasource=go depName=golang.org/x/vuln
-      run: go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 -format json ./... | bash hack/govulncheck-filter.sh
+      run: go run golang.org/x/vuln/cmd/govulncheck@v1.10.0 -format json ./... | bash hack/govulncheck-filter.sh
     - name: Execute build
       run: make install
     - name: Execute tests
